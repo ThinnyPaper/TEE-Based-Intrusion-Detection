@@ -1,0 +1,269 @@
+Version 0.17.4 (2022-01-19)
+    * SECURITY FIX
+        - Precalculate buffer size in base64 functions (CVE-2021-45417)
+
+Version 0.17.3 (2021-02-10)
+    * Fix group usage in '--after' config line
+
+Version 0.17.2 (2021-02-06)
+    * Fix null pointer dereference in db_close()
+    * Fix out-of-bounds read of attributes array
+
+Version 0.17.1 (2021-01-30)
+    * Require file type for --path-check
+    * Fix issue where 'different attributes' message is not shown
+    * Remove leftover include of 'error.h' (fixes build on macOS)
+    * Fix typos
+
+Version 0.17 (2021-01-23)
+    * BACKWARDS INCOMPATIBLE CHANGES
+        - '--verbose' command line option and 'verbose' config option are no
+          longer supported, use 'log_level' and 'report_level' options instead
+        - '--report' command line option is no longer supported, use
+          'report_url' config option instead
+        - 'ignore_list' config option is no longer supported, use
+          'report_ignore_changed_attrs' instead
+        - 'report_attributes' config option is no longer supported, use
+          'report_force_attrs' instead
+        - (restricted) regular rules must start with literal '/', i.e. the rule
+          cannot begin with a macro variable
+        - config lines must end with new line
+        - '@' and ' ' in the configuration are now escaped with '\', that means
+          to match a '\' you have to use four backslashes '\\\\' in your rules
+        - 'gzip_dbout=false' fails now with config error when no zlib support
+          is compiled in
+        - remove '--with-initial-errors' configure option
+        - remove PostgreSQL database backend support
+        - remove Sun ACL support
+        - remove config and database signing support
+    * Enhancements:
+        - add new '--log-level' command line option and 'log_level' config option
+        - introduce named log levels
+        - add new 'report' log level to help to debug rule matching
+        - add new 'config' log level to help to debug config and rule parsing
+        - aad new '--dry-init' command
+        - add new '--path-check' command
+        - add directory support for @@include
+        - add new @@x_include config macro
+        - add new @@x_include_setenv config macro
+        - add new default compound group 'H' (all compiled-in hashsums)
+        - add support for per-report_url options
+        - add new 'report_level' config option
+        - add new 'report_append' config option
+        - add exit code 21 for file lock errors
+        - add default config values, available hashsums and compound groups
+          to '--version' output
+        - add Linux capabilities support
+        - show changed attributes in 'different attributes' message
+        - enable 'gost' and 'whirlpool' checksums when using gcrypt
+        - add 'stribog256' and 'stribog512' gcrypt algorithms
+        - add config file names to log output
+    * Miscellaneous behaviour changes:
+        - 'report_summarize_changes': hashsum changes are now indicated with 'H'
+        - print '--help' and '--verion' output to stdout
+        - log messages and errors are always written to stderr
+        - initialise report URLs after configuration parsing
+        - allow empty values for macro variables
+        - SIGUSR1 now toggles debug log level
+        - fail on errors in regular expressions during config parsing
+        - fail on invalid URLs during config check
+        - Fail on double slash in rule path
+        - cache log lines when 'log_level' is not yet set
+    * Deprecations:
+        - 'database' config option is now deprecated, use 'database_in' instead
+        - 'summarize_changes' config option is now deprecated, use
+          'report_summarize_changes' instead
+        - 'grouped' config option is now deprecated, use 'report_grouped'
+          instead
+        - non-alphanumeric group names are deprecated
+    * Notable bug fixes:
+       - fix line numbers in log messages
+       - remove warning when input database is '/dev/null'
+       - correctly handle UTF-8 in path names and rules
+       - fix compilation with curl and gcrypt
+       - warn on unsupported hash algorithms
+       - improve large-file support
+    * Build system changes:
+        - require C99 compatible compiler
+        - require pkg-config
+        - '--disable-default-db configure option disables default database values
+        - '--without-config' configure option now disables default config file
+    * Remove obsolete aide-attributes.sh script
+    * Remove outdated example aide.conf and manual.html
+    * Fix compiler warnings
+    * Update documentation
+    * Minor bug fixes
+    * Code clean up
+
+Version 0.16.2 (2019-05-19)
+    * Bug fixes
+        - Fix handling of directory-restricted negative rules
+        - Don't lock '/dev/null' when used as output database
+        - Fix parsing of rules containing '?' quantifier
+        - Fix extended attributes support (xattrs)
+        - Fix processing of go files
+    * Please note:
+        - The addition of the "trusted.*", "user.*" and the "security.*"
+          namespaces to the xattrs attribute might lead to a vast amount of
+          reported changed entries during your next AIDE run. You can use the
+          `report_ignore_changed_attrs` option (see aide.conf(5)) to ignore
+          changes of the xattrs attribute; but be aware that this will exclude
+          the expected but also the unexpected (potentially malicious) changes.
+
+Version 0.16.1 (2019-02-25)
+    * Move to GitHub
+    * Update documentation
+    * Bug fixes
+
+Version 0.16 (2016-07-25)
+    * BACKWARDS INCOMPATIBLE CHANGES:
+        - Negative selection lines of the form '!<regex> <groups>' are no
+          longer supported (use '!<regex>' instead)
+        - The switch to Perl 5 Compatible Regular Expressions and the fix of
+          '.*'-rule matching may result in different rule matching behaviour
+    * Support restricted selection lines
+    * Switch to PCRE library (drops bundled GNU regexp library)
+    * New config options:
+        - database_add_metadata
+        - database_attrs
+        - report_base16
+        - report_detailed_init
+        - report_force_attrs (deprecates report_attributes)
+        - report_ignore_added_attrs
+        - report_ignore_removed_attrs
+        - report_ignore_changed_attrs (deprecates ignore_list)
+        - report_ignore_e2fsattrs
+        - report_quiet
+        - root_prefix
+    * New '--limit' parameter
+    * Report changes:
+        - enable summarize_changes by default
+        - use '|' to separate the old value from the new one
+        - wrap attribute values instead of cut them off
+        - side-by-side output of acl and xattrs values
+        - adjust file type letters in summarize_changes output
+        - add numeric timezone to time string
+        - add info about verbose level to report if it differs from standard
+          value
+        - add info about number of entries if aide found no changes or
+          the database has been initialized
+        - add run time to report
+        - print "End timestamp" message in report
+        - print human-readable info about ignored and forced attributes in report
+        - print checksums of databases in verbose level 2 or higher
+        - print added and removed attribute values of changed entries in
+          verbose level 6 or higher
+        - print details about added and removed entries in verbose level 7
+          or higher
+        - print added or removed attributes of changed entries if forced via
+          report_force_attrs
+    * New default group: X
+    * Fix '.*'-rule matching
+    * Handle tilde (~) in database paths and report urls
+    * Sort entries of database file
+    * Compare database entries just once
+    * Add warning if a group is redefined
+    * Update documentation
+    * Bug fixes
+    * Code clean up
+
+Version 0.15.1
+    * Fixed bug with DB_CHECKINODE
+
+Version 0.15
+    * Added new grouped option
+    * Sort files in report by filename
+    * Added support for e2fsattrs attribute
+    * Added support for ftype attribute
+    * Bug fixes
+
+Version 0.14.2
+    * Report correct file type in "Detailed information
+      about changes" section
+    * Bug fixes
+
+Version 0.14.1
+    * Added aide-attributes.sh contrib script
+    * Bug fixes
+
+Version 0.14
+    * Renewed autoconf mechanism
+    * Resolved licensing conflicts
+    * New feature to summarize changes
+    * Added prelink support
+    * Many bugfixes
+
+Version 0.13.1
+    * Fixed bug with reading gzipped aide.db files
+    * Removed dead ustat code
+
+Version 0.13
+    * Added support for selinux and xattr attributes
+      (kindly contributed by Red Hat)
+    * Added support for the Linux Audit System
+      (kindly contributed by Red Hat)
+    * Fixed usage of libgcrypt instead of libmhash
+    * Added file locking for output files
+    * Fixed bugs
+
+Version 0.12
+    * Fixed bugs
+    * Allow http/https/ftp URLs through libcurl
+    * Support posix_fadvice() to avoid caching files
+
+Version 0.11
+    * Fixed many bugs
+    * Updated automake/autoconf scripts
+    * Use snprintf by Mark Martinec if not in C library
+    * Support for more (legacy) Unix systems and cygwin
+    * Open files with O_NOATIME on supported Linux systems
+    * Added I/ANF/ARF directives
+
+Version 0.10
+    * Fixed bugs
+    * Moved project over to sourceforge.net
+    * Change of project ownership
+
+Version 0.9
+    * Fixed bugs
+    * Added support for keyed md check of db and config
+    * Removed dependancy on libgcrypt
+    * Added dependancy on mhash
+
+Version 0.8
+    * Fixed loads and loads of bugs
+        * Added syslog backend
+        * Report format changed
+        * added lots of parameters see man page and configure --help
+        * added ACL support for SunOS 5.x (and compatibles)
+    * libgcrypt is now separate and required
+
+Version 0.7
+    * Bug fixes
+    * Compressed database support
+    * Linkname checking
+    * Mhash support (version 0.8.1 of mhash required)
+
+Version 0.6
+    * Bug fixes
+    * Mhash support fixed
+    * MD sums fixed for now
+
+Version 0.5
+    * Bug fixes
+    * ignore_list support
+    * Mhash library support (version 0.6.1 of mhash required)
+    * Disclaimer notices
+
+Version 0.4
+    * Bug fixes
+
+Version 0.3
+    * Added --update command
+    * some bugfixes
+Version 0.2
+    * Bugfix release
+Version 0.1
+    * Implemented lots of stuff
+Version 0.0.0.1
+    * Nothing yet
