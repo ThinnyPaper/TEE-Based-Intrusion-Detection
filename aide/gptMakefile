@@ -1,0 +1,66 @@
+CC = gcc
+LEX = flex
+YACC = bison
+
+# 指定头文件搜索路径
+INCLUDES = -I include
+
+# 指定需要链接的库
+LIBS = -lgcrypt -lgelf -lmhash -lpcre -lz -lcap -lxattr
+
+# 指定编译器标志
+CFLAGS = -Wall $(INCLUDES) -Isrc
+LFLAGS = $(LIBS)
+
+# 源文件目录和对象文件目录
+SRC_DIR = src
+OBJ_DIR = obj
+
+# 自动生成源文件列表，排除由yacc和lex直接生成的.c文件
+SRC = $(filter-out $(SRC_DIR)/conf_lex.c $(SRC_DIR)/conf_yacc.c $(SRC_DIR)/db_lex.c, $(wildcard $(SRC_DIR)/*.c))
+
+# yacc和lex生成的文件
+YACC_SRC = $(SRC_DIR)/conf_yacc.y
+LEX_SRC = $(SRC_DIR)/conf_lex.l $(SRC_DIR)/db_lex.l
+
+# 由yacc和lex生成的.c和.h文件
+GEN_C = $(YACC_SRC:.y=.c) $(LEX_SRC:.l=.c)
+GEN_H = $(YACC_SRC:.y=.h) # lex通常不生成.h文件
+
+# 最终的源文件列表包含原始.c文件和生成的.c文件
+ALL_SRC = $(SRC) $(GEN_C)
+
+# 对象文件列表
+OBJ = $(ALL_SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
+
+# 指定最终目标
+TARGET = myproject
+
+# 默认目标
+all: $(TARGET)
+
+$(TARGET): $(OBJ)
+	$(CC) $^ -o $@ $(LFLAGS)
+
+# 规则生成对象文件
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+	$(CC) -c $< -o $@ $(CFLAGS)
+
+# 特殊处理yacc和lex文件，yacc文件生成.c和.h文件
+$(SRC_DIR)/conf_yacc.c $(SRC_DIR)/conf_yacc.h: $(SRC_DIR)/conf_yacc.y
+	$(YACC) -o $(SRC_DIR)/conf_yacc.c --defines=$(SRC_DIR)/conf_yacc.h $<
+
+$(SRC_DIR)/conf_lex.c: $(SRC_DIR)/conf_lex.l
+	$(LEX) -o $@ $<
+
+$(SRC_DIR)/db_lex.c: $(SRC_DIR)/db_lex.l
+	$(LEX) -o $@ $<
+
+$(OBJ_DIR):
+	mkdir -p $@
+
+# 清理目标
+clean:
+	rm -rf $(OBJ_DIR) $(TARGET) $(GEN_C) $(GEN_H)
+
+.PHONY: all clean

@@ -1,0 +1,41 @@
+CC = gcc
+LEX = flex
+YACC = bison
+
+# 编译标志
+CFLAGS = -Wall -g
+LFLAGS = 
+YFLAGS = -d
+
+# 源文件和对象文件
+SRCS = $(wildcard src/*.c) src/conf_yacc.c src/conf_lex.c src/db_lex.c
+OBJS = $(SRCS:.c=.o)
+
+# 可执行文件名
+EXEC = aide
+
+# 默认目标
+all: $(EXEC)
+
+# 生成可执行文件
+$(EXEC): $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $(OBJS) -lm
+
+# 生成YACC/Bison源文件
+src/conf_yacc.c: src/conf_yacc.y
+	$(YACC) $(YFLAGS) -o $@ $<
+
+# 生成LEX/Flex源文件
+src/conf_lex.c: src/conf_lex.l
+	$(LEX) $(LFLAGS) -o $@ $<
+
+src/db_lex.c: src/db_lex.l
+	$(LEX) $(LFLAGS) -o $@ $<
+
+# 通用规则来编译每个.o文件
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# 清理目标
+clean:
+	rm -f $(OBJS) $(EXEC) src/conf_yacc.c src/conf_yacc.h src/conf_lex.c src/db_lex.c
