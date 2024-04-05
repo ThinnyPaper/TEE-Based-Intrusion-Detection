@@ -24,7 +24,6 @@
 #include <errno.h>
 
 #include "log.h"
-#include "locale-aide.h"
 
 LOG_LEVEL prev_log_level = LOG_LEVEL_UNSET;
 LOG_LEVEL log_level = LOG_LEVEL_UNSET;

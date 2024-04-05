@@ -1,0 +1,11 @@
+@@define RSYSLOG_LOGDIR var/log
+@@define RSYSLOG_LOGFILES4R (syslog|messages|debug|(cron|lpr|auth|daemon|kern|user)\\.log|mail\\.(log|err|warn|info))
+/@@{RSYSLOG_LOGDIR}/@@{RSYSLOG_LOGFILES4R}$ f Log
+/@@{RSYSLOG_LOGDIR}/@@{RSYSLOG_LOGFILES4R}\\.1$ f LowLog
+/@@{RSYSLOG_LOGDIR}/@@{RSYSLOG_LOGFILES4R}\\.2\\.@@{LOGEXT}$ f LoSerMemberLog
+/@@{RSYSLOG_LOGDIR}/@@{RSYSLOG_LOGFILES4R}\\.3\\.@@{LOGEXT}$ f SerMemberLog
+/@@{RSYSLOG_LOGDIR}/@@{RSYSLOG_LOGFILES4R}\\.4\\.@@{LOGEXT}$ f HiSerMemberLog
+/@@{RSYSLOG_LOGDIR}$ d VarDir
+
+/@@{RUN}/rsyslogd.pid$ f VarFile
+/@@{RUN}/sendsigs\\.omit\\.d/rsyslog$ f VarInode

@@ -1,0 +1,75 @@
+# this is a preliminary paranoid rule from a local installation. Feel free to submit
+# patches that may make the rule suitable for your installation
+
+@@define RUNUDEVCONT [bcn][[:digit:]]+(:[[:digit:]]+)?
+@@define RUNUDEVVIDEO card0-(e?DP|HDMI-A|Virtual)-[1234]
+!/@@{RUN}/udev$ d
+!/@@{RUN}/udev/control$ s
+!/@@{RUN}/udev/(data|links|tags|watch)$ d
+!/@@{RUN}/udev/data/@@{RUNUDEVCONT}$ f
+!/@@{RUN}/udev/data/\\+input:input[0123456]$ f
+!/@@{RUN}/udev/data/\\+module:(af_alg|algif_skcipher|configfs|dm_crypt)$ f
+!/@@{RUN}/udev/data/\\+acpi:(device|LNX(CPU|[[:upper:]]{5})|(LEN|PNP|SMO)[[:xdigit:]]{4}|ACPI[[:digit:]]{4}|QEMU[[:digit:]]{4}):[0123][[:xdigit:]]$ f
+!/@@{RUN}/udev/data/\\+ata_device:dev[[:digit:]]\\.[01]$ f
+!/@@{RUN}/udev/data/\\+ata_link:link[[:digit:]]$ f
+!/@@{RUN}/udev/data/\\+ata_port:ata[[:digit:]]$ f
+!/@@{RUN}/udev/data/\\+bdi:[[:digit:]]+:[[:digit:]]+$ f
+!/@@{RUN}/udev/data/\\+bus:(acpi|cec|clockevents|clocksource|container|cpu|dax|event_source|gpio|hid|i2c|machinecheck|mdio_bus|nd|node|nvmem|parport|pci(_express)?|platform|pnp|scsi|ser(ial|io)|usb(-serial)?|virtio|workqueue|xen(-backend)?)$ f
+!/@@{RUN}/udev/data/\\+by_name:(etc|genroms)$ f
+!/@@{RUN}/udev/data/\\+class:(ata_(device|link|port)|hwmon|leds|macvtap|mdio_bus|pps|ptp|scsi_(disk|generic)|tpm(rm)?|usbmisc|virtio-ports)$ f
+!/@@{RUN}/udev/data/\\+clockevents:(broadcast|clock(event[01234567]|source0))$ f
+!/@@{RUN}/udev/data/\\+clocksource:clocksource0$ f
+!/@@{RUN}/udev/data/\\+container:PNP0A06:0[023]$ f
+!/@@{RUN}/udev/data/\\+cpu:cpu[0123]$ f
+!/@@{RUN}/udev/data/\\+dma:dma0chan[01234]$ f
+!/@@{RUN}/udev/data/\\+dmi:id$ f
+!/@@{RUN}/udev/data/\\+drivers:[-[:lower:][:digit:]_]+:[-[:alnum:]\ _]+$ f
+!/@@{RUN}/udev/data/\\+drm:@@{RUNUDEVVIDEO}$ f
+!/@@{RUN}/udev/data/\\+etc:(acpi|smbios|tpm)$ f
+!/@@{RUN}/udev/data/\\+event_source:(amd_(l2|nb)|breakpoint|cpu|cstate_(core|pkg)|ibs_(fetch|op)|msr|power|software|uncore_(arb|cbox_[01]))$ f
+!/@@{RUN}/udev/data/\\+graphics:fbcon$ f
+!/@@{RUN}/udev/data/\\+hid:0003:[[:xdigit:]]{4}:[[:digit:]]{4}\\.000[12]$ f
+!/@@{RUN}/udev/data/\\+hwmon:hwmon[01]$ f
+!/@@{RUN}/udev/data/\\+i2c:(dummy|i2c-[01234])$ f
+!/@@{RUN}/udev/data/\\+leds:(apu:green:[23]|input[0123]::(caps|num|scroll)lock|bananapi:green:usr)$ f
+!/@@{RUN}/udev/data/\\+machinecheck:machinecheck[0123]$ f
+!/@@{RUN}/udev/data/\\+mdio_bus:[[:alnum:]]+-[[:digit:]]+(:00)?$ f
+!/@@{RUN}/udev/data/\\+module:[[:alnum:]_]+$ f
+!/@@{RUN}/udev/data/\\+node:node0$ f
+!/@@{RUN}/udev/data/\\+nvmem:cmos_nvram0$ f
+!/@@{RUN}/udev/data/\\+parport:(lp\\.|parport)0$ f
+!/@@{RUN}/udev/data/\\+pci:0000:0[0123d]:[01][[:xdigit:]]\\.[[:digit:]]$ f
+!/@@{RUN}/udev/data/\\+pci_bus:0000:0[012345d]$ f
+!/@@{RUN}/udev/data/\\+pci_express:0000:00:[01][2456c].[01234]:pcie0[01][01]$ f
+!/@@{RUN}/udev/data/\\+platform:((ACPI|QEMU)000[23]|LEN0068|PNP0[18C][01][03494ACDE]):0[01]$ f
+!/@@{RUN}/udev/data/\\+platform:(axp20x-(adc|gpio|pek|regulator|usb-power-supply)|alarmtimer\\.0\\.auto|coretemp\\.0|cpufreq-dt|display-engine|dock\\.[01]|efivars\\.0|Fixed\ MDIO\ bus\\.0|gmac-3v3|gpio(-keys-polled|_amd_fch)|hdmi-connector|i8042|iio_hwmon\\.0|iTCO_wdt\\.0\\.auto|leds(-gpio)?|microcode|parport_pc\\.888|pcspkr|platform-framebuffer\\.0|pmu|psci|reg-dummy|serial8250|simple-framebuffer\\.0|snd-soc-dummy|soc|sp5100-tco|sun5i-a13-gpadc-iio\\.0|timer|usb[012]-vbus|vcc(3v[03]|5v0))$ f
+!/@@{RUN}/udev/data/\\+platform:((0|10000)\\.sram|1c00000\\.system-control|1c02000\\.dma-controller|1c05000\\.spi|1c0c000\\.lcd-controller|1c0d000\\.lcd-controller|1c0e000\\.video-codec|1c0f000\\.mmc|1c13000\\.usb|1c13400\\.phy|1c14000\\.usb|1c14400\\.usb|1c15000\\.crypto-engine|1c16000\\.hdmi|1c18000\\.sata|1c1c000\\.usb|1c1c400\\.usb|1c20800\\.pinctrl|1c20c00\\.timer|1c20c90\\.watchdog|1c20d00\\.rtc|1c21800\\.ir|1c22c00\\.codec|1c23800\\.eeprom|1c25000\\.rtp|1c28000\\.serial|1c28c00\\.serial|1c29c00\\.serial|1c2ac00\\.i2c|1c2b400\\.i2c|1c40000\\.gpu|1c50000\\.ethernet|1c60000\\.hstimer|1d00000\\.sram|1e00000\\.display-frontend|1e20000\\.display-frontend|1e40000\\.display-backend|1e60000\\.display-backend|7fe79000\\.framebuffer)$f
+!/@@{RUN}/udev/data/\\+pnp:00:0[012345]$ f
+!/@@{RUN}/udev/data/\\+powercap:intel-rapl(:0(:[01])?)?$ f
+!/@@{RUN}/udev/data/\\+queues:(tx|rx)-[0123]$ f
+!/@@{RUN}/udev/data/\\+scsi:([1026]:0:0:0|host[0123456]|target[0126]:0:0)$ f
+!/@@{RUN}/udev/data/\\+scsi_(device|disk):[0126]:0:0:0$ f
+!/@@{RUN}/udev/data/\\+scsi_host:host[0123456]$ f
+!/@@{RUN}/udev/data/\\+serio:serio[012]$ f
+!/@@{RUN}/udev/data/\\+sound:card0$ f
+!/@@{RUN}/udev/data/\\+thermal:(cooling_device[0123]|thermal_zone[01])$ f
+!/@@{RUN}/udev/data/\\+usb:[-[:digit:]\\.:]+$ f
+!/@@{RUN}/udev/data/\\+usb-serial:ttyUSB[[:digit:]]$ f
+!/@@{RUN}/udev/data/\\+vars:(AcpiGlobalVariable|Boot(00[[:xdigit:]]{2}|Current|OptionSupport|Order(Default)?)|Con(In|Out)(Dev)?|ConsoleLock|DIAGSPLSHSCRN|ErrOut(Dev)?|HDDPWD|Key000[012345]|LB[CL]|LBOL|(LBOP|LKOP)00[[:xdigit:]]{2}|LWO|LastBootCurrent|Lenovo((Security|System)?Config|PciResource|ScratchData)|LocalSecurityVars|MTC|MailBoxQ|MeBiosExtensionSetup|MemRestoreVariable|MemoryOverwriteRequestControl|OpromDevicePath|P(ba|wd)StatusVar|PchInit|PchS3Peim|PlatformLang(Codes)?|ProtectedBootOptions|SMBIOS(ELOG000|ELOGNUMBER|LEN|MEMSIZE)|Setup(HotKey)?|SmmS3NvsData|System|TcgSetup|Timeout|UCR)-[[:xdigit:]]{8}-([[:xdigit:]]{4}-){3}[[:xdigit:]]{12}$ f
+!/@@{RUN}/udev/data/\\+virtio:virtio[012345]$ f
+!/@@{RUN}/udev/data/\\+vtconsole:vtcon[01]$ f
+!/@@{RUN}/udev/data/\\+workqueue:(raid5wq|writeback)$ f
+!/@@{RUN}/udev/link\\.dvd$ l
+!/@@{RUN}/udev/links/\\\\x2f[-[:alnum:]_]+(\\\\x2f[-[:alnum:]_\\.]+)?$ d
+!/@@{RUN}/udev/links/\\\\x2f[-[:alnum:]_]+(\\\\x2f[-[:alnum:]_\\.]+)?/@@{RUNUDEVCONT}$ f
+!/@@{RUN}/udev/links/\\\\x2f(disk|dri|input|serial|snd)\\\\x2fby-(id|label|partlabel|partuuid|path|uuid)\\\\x2f[^/]+$ d
+!/@@{RUN}/udev/links/\\\\x2f(disk|dri|input|serial|snd)\\\\x2fby-(id|label|partlabel|partuuid|path|uuid)\\\\x2f[^/]+/@@{RUNUDEVCONT}$ f
+!/@@{RUN}/udev/static_node-tags(/uaccess)?$ d
+!/@@{RUN}/udev/static_node-tags/uaccess/snd\\\\x2f(seq|timer)$ l
+!/@@{RUN}/udev/tags/(power-switch|(master-of-)?seat|systemd|uaccess)$ d
+!/@@{RUN}/udev/tags/(power-switch|(master-of-)?seat|systemd|uaccess)/@@{RUNUDEVCONT}$ f
+!/@@{RUN}/udev/tags/systemd/\\+module:(configfs|fuse)$ f
+!/@@{RUN}/udev/tags/(master-of-)?seat/\\+drm:@@{RUNUDEVVIDEO}$ f
+!/@@{RUN}/udev/tags/seat/(\\+input:input[[:digit:]]+|\\+leds:(bananapi:green:usr|input[[:digit:]]+::(caps|num|scroll)lock))$ f
+!/@@{RUN}/udev/tags/seat/\\+sound:card0$ f
+!/@@{RUN}/udev/watch/[[:digit:]]+$ l

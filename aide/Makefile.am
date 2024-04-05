@@ -47,7 +47,6 @@ aide_SOURCES = src/aide.c include/aide.h \
 	include/rx_rule.h src/rx_rule.c \
 	include/list.h src/list.c \
 	include/log.h src/log.c \
-	include/locale-aide.h \
 	include/md.h src/md.c \
 	include/seltree_struct.h \
 	include/seltree.h src/seltree.c \

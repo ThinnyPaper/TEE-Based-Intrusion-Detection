@@ -1,0 +1,2 @@
+/var/log/wtmp$ f Log
+/var/log/wtmp\\.1$ f LowLog

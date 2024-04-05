@@ -62,11 +62,11 @@ char *expand_tilde(char * path);
 #ifndef HAVE_STRNSTR
 char* strnstr(char* haystack,char* needle,int n);
 #endif
-
+/*
 #ifndef HAVE_STRNLEN
 size_t strnlen(const char *s, size_t maxlen);
 #endif
-
+*/
 int syslog_facility_lookup(char *);
 
 #endif

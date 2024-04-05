@@ -53,5 +53,4 @@ bool do_repurldef(char*, int, char*, char*);
 
 void do_rootprefix(char*, int, char*, char*);
 
-void do_report_ignore_e2fsattrs(char*, int, char*, char*);
 #endif

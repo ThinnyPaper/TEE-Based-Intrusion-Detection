@@ -35,9 +35,7 @@
 #include <dirent.h>
 #include <time.h>
 
-#if HAVE_UNISTD_H
 #include <unistd.h>
-#endif
 
 #include "md.h"
 #include "commandconf.h"
@@ -53,9 +51,7 @@
 #include "list.h"
 #include "util.h"
 #include "base64.h"
-/*for locale support*/
-#include "locale-aide.h"
-/*for locale support*/
+
 db_config* conf;
 char* before = NULL;
 char* after = NULL;
@@ -67,7 +63,7 @@ char* after = NULL;
 static void usage(int exitvalue)
 {
   fprintf(stdout,
-	  _("Usage: aide [options] command\n\n"
+	  _("Usage: idtt [options] command\n\n"
 	    "Commands:\n"
 	    "  -i, --init\t\tInitialize the database\n"
 	    "  -n, --dry-init\tTraverse the file system and match each file against rule tree\n"
@@ -235,7 +231,7 @@ static void read_param(int argc,char**argv)
   };
 
   while(1){
-    option = getopt_long(argc, argv, "hL:V::vc:l:p:B:A:riCuDEn", options, &i);
+    option = getopt_long(argc, argv, "hL::vc:l:p:B:A:riCuDEn", options, &i);
     if(option==-1)
       break;
     switch(option)
@@ -248,10 +244,7 @@ static void read_param(int argc,char**argv)
 	print_version();
 	break;
       }
-      case 'V':{
-        INVALID_ARGUMENT("--verbose", %s, "option no longer supported, use 'log_level' and 'report_level' options instead (see man aide.conf for details)")
-	break;
-      }
+
       case 'c':{
 	  conf->config_file=optarg;
       log_msg(LOG_LEVEL_INFO,_("(--config): set config file to '%s'"), conf->config_file);
@@ -357,9 +350,6 @@ static void setdefaults_before_config()
   conf->report_ignore_removed_attrs = 0;
   conf->report_ignore_changed_attrs = 0;
   conf->report_force_attrs = 0;
-#ifdef WITH_E2FSATTRS
-  conf->report_ignore_e2fsattrs = 0UL;
-#endif
 
   conf->check_path=NULL;
   conf->check_file_type = FT_REG;
@@ -376,9 +366,6 @@ static void setdefaults_before_config()
       ;
   conf->config_version=NULL;
   
-#ifdef WITH_ACL
-  conf->no_acl_on_symlinks=0; /* zero means don't do ACLs on symlinks */
-#endif
   conf->db_out_attrs = ATTR(attr_filename)|ATTR(attr_attr)|ATTR(attr_perm)|ATTR(attr_inode);
 
   conf->symlinks_found=0;
@@ -462,17 +449,8 @@ static void setdefaults_before_config()
   }
 
   X=0LLU;
-#ifdef WITH_ACL
-  X|=ATTR(attr_acl);
-#endif
-#ifdef WITH_SELINUX
-  X|=ATTR(attr_selinux);
-#endif
 #ifdef WITH_XATTR
   X|=ATTR(attr_xattrs);
-#endif
-#ifdef WITH_E2FSATTRS
-  X|=ATTR(attr_e2fsattrs);
 #endif
 #ifdef WITH_CAPABILITIES
   X|=ATTR(attr_capabilities);
@@ -531,11 +509,6 @@ int main(int argc,char**argv)
 {
   int errorno=0;
 
-#ifdef USE_LOCALE
-  setlocale(LC_ALL,"");
-  bindtextdomain(PACKAGE,LOCALEDIR);
-  textdomain(PACKAGE);
-#endif
   umask(0177); //仅本用户可读写
   init_sighandler();
 

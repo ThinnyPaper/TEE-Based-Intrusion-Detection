@@ -1,0 +1,9 @@
+/@@{RUNLOCK}/lvm$ d VarDirInode
+/@@{RUN}/lvm/(new)?hints$ f VarFile
+/@@{RUN}/lvm(/((lvs|pvs)_online|pvs_lookup))?$ d VarDirInode
+/@@{RUN}/lvm/pvs_online/[[:alnum:]]{32}$ f VarFile
+!/@@{RUN}/lvm/lvm(etad|polld)\\.socket$ s
+/@@{RUN}/lvmetad\\.pid$ f VarFile
+@@ifdef LVM_VGS_ONLINE
+/@@{RUN}/lvm/vgs_online/@@{LVM_VGS_ONLINE}$ f VarFile
+@@endif

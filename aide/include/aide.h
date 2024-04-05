@@ -46,17 +46,13 @@
         __result; }))
 #endif
 
-#ifndef O_NOATIME
+
 #if defined(__linux__) && (defined(__i386__) || defined(__PPC__))
 #define O_NOATIME 01000000
 #else
 #define O_NOATIME 0
 #endif
-#endif
 
-#ifdef strtoimax
-# define HAVE_STRTOIMAX
-#endif
 
 #ifndef __NetBSD__
 #ifndef _POSIX_C_SOURCE

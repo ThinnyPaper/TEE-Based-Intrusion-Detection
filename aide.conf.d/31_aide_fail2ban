@@ -1,0 +1,7 @@
+/var/log/fail2ban\\.log$ f Log
+/var/log/fail2ban\\.log\\.1$ f LowLog
+/var/log/fail2ban\\.log\\.2\\.@@{LOGEXT}$ f LoSerMemberLog
+/var/log/fail2ban\\.log\\.3\\.@@{LOGEXT}$ f SerMemberLog
+/var/log/fail2ban\\.log\\.4\\.@@{LOGEXT}$ f HiSerMemberLog
+/@@{RUN}/fail2ban/fail2ban\\.(sock|pid)$ f VarFile
+/@@{RUN}/fail2ban$ d VarDirInode

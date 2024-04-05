@@ -40,12 +40,8 @@
 #include "util.h"
 #include "base64.h"
 #include "conf_eval.h"
-/*for locale support*/
-#include "locale-aide.h"
-/*for locale support*/
-#ifdef WITH_CURL
-#include "fopen.h"
-#endif
+
+
 
 #define BUFSIZE 4096
 #define ZBUFSIZE 16384
@@ -98,19 +94,6 @@ url_t* parse_url(char* val, int linenumber, char* filename, char* linebuf)
       break;
     }
     u->value=checked_strdup(r);
-    break;
-  }
-  case url_ftp :
-  case url_https :
-  case url_http : {
-#ifdef WITH_CURL
-    u->value=checked_strdup(val);
-#else
-    LOG_CONFIG_FORMAT_LINE(LOG_LEVEL_ERROR, %s, "http, https and ftp URL support not compiled in, recompile AIDE with '--with-curl'")
-    free(val_copy);
-    free(u);
-    return NULL;
-#endif /* WITH CURL */
     break;
   }
   case url_fd:
@@ -201,20 +184,6 @@ int db_input_wrapper(char* buf, int max_size, database* db)
   int c=0;
 #endif
 
-#ifdef WITH_CURL
-  switch ((db->url)->type) {
-  case url_http:
-  case url_https:
-  case url_ftp: {
-    retval=url_fread(buf,1,max_size,(URL_FILE *)db->fp);
-    if (db->mdc) {
-        update_md(db->mdc, buf, retval);
-    }
-    break;
-  } 
-  default:
-#endif /* WITH CURL */
-
 #ifdef WITH_ZLIB
   if (db->gzp!=NULL) {
     c=gzgetc(db->gzp);
@@ -251,10 +220,6 @@ int db_input_wrapper(char* buf, int max_size, database* db)
       update_md(db->mdc, buf, retval);
   }
 
-
-#ifdef WITH_CURL
-  }
-#endif /* WITH CURL */
   log_msg(LOG_LEVEL_TRACE,"db_input_wrapper(): return value: %d", retval);
   return retval;
 }
@@ -483,60 +448,3 @@ void do_rootprefix(char* val, int linenumber, char* filename, char* linebuf) {
     }
 }
 
-#ifdef WITH_E2FSATTRS
-#define easy_e2fsattrs_case(c,f) \
-case c: { \
-    conf->report_ignore_e2fsattrs|=f; \
-    break; \
-}
-
-void do_report_ignore_e2fsattrs(char* val, int linenumber, char* filename, char* linebuf) {
-    conf->report_ignore_e2fsattrs = 0UL;
-    while (*val) {
-        switch(*val){
-            /* source for mappings see report.c */
-            easy_e2fsattrs_case('s',EXT2_SECRM_FL)
-            easy_e2fsattrs_case('u',EXT2_UNRM_FL)
-            easy_e2fsattrs_case('S',EXT2_SYNC_FL)
-            easy_e2fsattrs_case('D',EXT2_DIRSYNC_FL)
-            easy_e2fsattrs_case('i',EXT2_IMMUTABLE_FL)
-            easy_e2fsattrs_case('a',EXT2_APPEND_FL)
-            easy_e2fsattrs_case('d',EXT2_NODUMP_FL)
-            easy_e2fsattrs_case('A',EXT2_NOATIME_FL)
-            easy_e2fsattrs_case('c',EXT2_COMPR_FL)
-            easy_e2fsattrs_case('B',EXT2_COMPRBLK_FL)
-            easy_e2fsattrs_case('Z',EXT2_DIRTY_FL)
-            easy_e2fsattrs_case('X',EXT2_NOCOMPR_FL)
-#ifdef EXT2_ECOMPR_FL
-            easy_e2fsattrs_case('E',EXT2_ECOMPR_FL)
-#else
-            easy_e2fsattrs_case('E',EXT4_ENCRYPT_FL)
-#endif
-            easy_e2fsattrs_case('j',EXT3_JOURNAL_DATA_FL)
-            easy_e2fsattrs_case('I',EXT2_INDEX_FL)
-            easy_e2fsattrs_case('t',EXT2_NOTAIL_FL)
-            easy_e2fsattrs_case('T',EXT2_TOPDIR_FL)
-#ifdef EXT4_EXTENTS_FL
-            easy_e2fsattrs_case('e',EXT4_EXTENTS_FL)
-#endif
-#ifdef EXT4_HUGE_FILE_FL
-            easy_e2fsattrs_case('h',EXT4_HUGE_FILE_FL)
-#endif
-#ifdef FS_NOCOW_FL
-            easy_e2fsattrs_case('C',FS_NOCOW_FL)
-#endif
-#ifdef EXT4_INLINE_DATA_FL
-            easy_e2fsattrs_case('N',EXT4_INLINE_DATA_FL)
-#endif
-            case '0': {
-                 break;
-            }
-            default: {
-                 LOG_CONFIG_FORMAT_LINE(LOG_LEVEL_NOTICE, ignore invalid ext2 file attribute: '%c', *val)
-                 break;
-            }
-        }
-        val++;
-    }
-}
-#endif

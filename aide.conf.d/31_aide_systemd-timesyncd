@@ -1,0 +1,2 @@
+/@@{RUN}/systemd/timesync/synchronized$ f VarFile
+/var/lib/systemd/timesync/clock$ f VarFile

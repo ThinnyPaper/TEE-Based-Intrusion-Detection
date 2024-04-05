@@ -19,9 +19,6 @@
  */
 
 #include "db_list.h"
-/*for locale support*/
-#include "locale-aide.h"
-/*for locale support*/
 
 void db_list_append(db_list*item)
 {

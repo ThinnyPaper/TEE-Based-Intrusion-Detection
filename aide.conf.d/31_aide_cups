@@ -1,0 +1,26 @@
+@@define CUPS_LOGS (access|error|page|cups-pdf)
+
+/var/(cache|spool)/cups$ d VarDir
+/var/cache/cups/job\\.cache(\\.O)?$ f VarFile
+/var/cache/cups/@@{IP4ADDRESS}\\.snmp$ f VarTime
+
+!/var/spool/cups/c[[:digit:]]{5}$ f
+!/var/spool/cups/d[[:digit:]]{5}-001$ f
+!/var/spool/cups/tmp/cups-dbus-notifier-lockfile$ f
+!/var/spool/cups/tmp/foomatic-[[:alnum:]]{6}$ f
+/var/spool/cups(/tmp)?$ d VarDir
+
+/@@{RUN}/cups/certs/0$ f VarFile
+/@@{RUN}/cups/printcap$ f VarFile
+/@@{RUN}/cups/cups\\.sock$ s VarFile
+/@@{RUN}/cups(/certs)?$ d VarDirInode
+
+/etc/cups$ d VarDir
+/etc/cups/(printers|subscriptions)\\.conf(\\.O)?$ f VarFile
+
+/var/log/cups/@@{CUPS_LOGS}_log$ f Log
+/var/log/cups/@@{CUPS_LOGS}_log\\.1\\.@@{LOGEXT}$ f LoSerMemberLog
+/var/log/cups/@@{CUPS_LOGS}_log\\.[2-6]\\.@@{LOGEXT}$ f SerMemberLog
+/var/log/cups/@@{CUPS_LOGS}_log\\.7\\.@@{LOGEXT}$ f HiSerMemberLog
+/var/log/cups$ d VarDir
+

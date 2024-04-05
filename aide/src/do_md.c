@@ -46,9 +46,6 @@
 #include "log.h"
 #include "attributes.h"
 #include "list.h"
-/*for locale support*/
-#include "locale-aide.h"
-/*for locale support*/
 
 /* This define should be somewhere else */
 #define READ_BLOCK_SIZE 16777216
@@ -201,10 +198,6 @@ void calc_md(struct stat* old_fs,db_line* line) {
   }
 #endif  
 
-#ifdef HAVE_O_NOATIME
-  filedes=open(line->fullpath,O_RDONLY|O_NOATIME);
-  if(filedes<0)
-#endif
     filedes=open(line->fullpath,O_RDONLY);
 
   if (filedes==-1) {
@@ -229,12 +222,13 @@ void calc_md(struct stat* old_fs,db_line* line) {
   }
   if(!(line->attr&ATTR(attr_rdev)))
 	  fs.st_rdev=0;
-  
+/*
 #ifdef HAVE_POSIX_FADVISE
   if (posix_fadvise(filedes,0,fs.st_size,POSIX_FADV_NOREUSE)!=0) {
     log_msg(LOG_LEVEL_DEBUG, "hash calculation: posix_fadvise error for '%s': %s", line->fullpath, strerror(errno));
   }
 #endif
+*/
   if ((stat_diff=stat_cmp(&fs,old_fs))==RETOK) {
     /*
       Now we have a 'valid' filehandle to read from a file.
@@ -433,62 +427,6 @@ void fs2db_line(struct stat* fs,db_line* line) {
   
 }
 
-#ifdef WITH_ACL
-void acl2line(db_line* line) {
-  acl_type *ret = NULL;
-  
-#ifdef WITH_POSIX_ACL
-  if(ATTR(attr_acl)&line->attr) {
-    acl_t acl_a;
-    acl_t acl_d;
-    char *tmp = NULL;
-
-    acl_a = acl_get_file(line->fullpath, ACL_TYPE_ACCESS);
-    acl_d = acl_get_file(line->fullpath, ACL_TYPE_DEFAULT);
-    if ((acl_a == NULL) && (errno == ENOTSUP)) {
-      line->attr&=(~ATTR(attr_acl));
-      return;
-    }
-    if (acl_a == NULL)
-      log_msg(LOG_LEVEL_WARNING, "tried to read access ACL on %s but failed with: %s",
-            line->fullpath, strerror(errno));
-    if ((acl_d == NULL) && (errno != EACCES)) /* ignore DEFAULT on files */
-    {
-      acl_free(acl_a);
-      log_msg(LOG_LEVEL_WARNING, "tried to read default ACL on %s but failed with: %s",
-            line->fullpath, strerror(errno));
-    }
-
-    ret = checked_malloc(sizeof(acl_type));
-
-    /* use tmp, so free() can be called instead of acl_free() */
-    tmp = acl_to_text(acl_a, NULL);
-    if (!tmp || !*tmp)
-      ret->acl_a = NULL;
-    else
-      ret->acl_a = checked_strdup(tmp);
-    acl_free(tmp);
-
-    if (!acl_d)
-      ret->acl_d = NULL;
-    else
-    {
-      tmp = acl_to_text(acl_d, NULL);
-      if (!tmp || !*tmp)
-        ret->acl_d = NULL;
-      else
-        ret->acl_d = checked_strdup(tmp);
-      acl_free(tmp);
-    }
-
-    acl_free(acl_a);
-    acl_free(acl_d);
-  }
-  line->acl = ret;
-#endif  
-}
-#endif
-
 #ifdef WITH_XATTR
 static xattrs_type *xattr_new(void) {
     xattrs_type *ret = NULL;
@@ -586,41 +524,6 @@ next_attr:
 }
 #endif
 
-#ifdef WITH_SELINUX
-void selinux2line(db_line *line) {
-    char *cntx = NULL;
-
-    if (!(ATTR(attr_selinux)&line->attr))
-        return;
-
-    if (lgetfilecon_raw(line->fullpath, &cntx) == -1) {
-        line->attr&=(~ATTR(attr_selinux));
-        if ((errno != ENOATTR) && (errno != EOPNOTSUPP))
-            log_msg(LOG_LEVEL_WARNING, "lgetfilecon_raw failed for %s: %s", line->fullpath, strerror(errno));
-        return;
-    }
-
-    line->cntx = checked_strdup(cntx);
-
-    freecon(cntx);
-}
-#endif
-
-#ifdef WITH_E2FSATTRS
-void e2fsattrs2line(db_line* line) {
-    unsigned long flags;
-    if (ATTR(attr_e2fsattrs)&line->attr) {
-        if (fgetflags(line->fullpath, &flags) == 0) {
-            line->e2fsattrs=flags;
-        } else {
-            line->attr&=(~ATTR(attr_e2fsattrs));
-            line->e2fsattrs=0;
-        }
-    } else {
-        line->e2fsattrs=0;
-    }
-}
-#endif
 
 #ifdef WITH_CAPABILITIES
 void capabilities2line(db_line* line) {

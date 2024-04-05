@@ -25,7 +25,6 @@
 #include "rx_rule.h"
 
 typedef enum config_option {
-    ACL_NO_SYMLINK_FOLLOW_OPTION,
     DATABASE_ADD_METADATA_OPTION,
     DATABASE_ATTRIBUTES_OPTION,
     DATABASE_GZIP_OPTION,
@@ -40,7 +39,6 @@ typedef enum config_option {
     REPORT_IGNORE_ADDED_ATTRS_OPTION,
     REPORT_IGNORE_REMOVED_ATTRS_OPTION,
     REPORT_IGNORE_CHANGED_ATTRS_OPTION,
-    REPORT_IGNORE_E2FSATTRS_OPTION,
     REPORT_LEVEL_OPTION,
     REPORT_QUIET_OPTION,
     REPORT_APPEND_OPTION,
@@ -49,7 +47,6 @@ typedef enum config_option {
     ROOT_PREFIX_OPTION,
     WARN_DEAD_SYMLINKS_OPTION,
     VERBOSE_OPTION,
-    CONFIG_VERSION,
 } config_option;
 
 typedef enum attribute_operator {

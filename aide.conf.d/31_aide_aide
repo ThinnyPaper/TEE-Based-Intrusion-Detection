@@ -1,0 +1,11 @@
+/var/lib/aide/aide\\.db(\\.new)?$ f VarFile
+/var/lib/aide$ d VarDir
+/var/log/aide/aide\\.log(\\.0)?$ f LowLog
+/var/log/aide/aide\\.log\\.1\\.@@{LOGEXT}$ f LoSerMemberLog
+/var/log/aide/aide\\.log\\.[2-5]\\.@@{LOGEXT}$ f SerMemberLog
+/var/log/aide/aide\\.log\\.6\\.@@{LOGEXT}$ f HiSerMemberLog
+/var/log/aide$ d VarDir
+!/@@{RUN}/aide$ d
+!/@@{RUN}/aide/cron\\.daily\\.lock$ f
+!/var/tmp/aide\\.cron\\.daily$ d
+!/var/tmp/aide\\.cron\\.daily/((error|a(run|err))log|mailfile)$ f

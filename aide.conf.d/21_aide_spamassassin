@@ -1,0 +1,16 @@
+#!/bin/bash
+
+SAVERSION_QRESULT="$(dpkg-query --show --showformat '${Version}\n' spamassassin 2>/dev/null)"
+
+if [ -n "${SAVERSION_QRESULT}" ]; then
+  SAVERSION_C1="$(echo ${SAVERSION_QRESULT} | sed 's/^\([[:digit:]]\+\)\.\([[:digit:]]\+\)\.\([[:digit:]]\+\)-[[:digit:]]\+$/\1/')"
+  SAVERSION_C2="$(echo ${SAVERSION_QRESULT} | sed 's/^\([[:digit:]]\+\)\.\([[:digit:]]\+\)\.\([[:digit:]]\+\)-[[:digit:]]\+$/\2/')"
+  SAVERSION_C3="$(echo ${SAVERSION_QRESULT} | sed 's/^\([[:digit:]]\+\)\.\([[:digit:]]\+\)\.\([[:digit:]]\+\)-[[:digit:]]\+$/\3/')"
+
+  # insert plausibility checks here
+
+  printf "@@define SA_VERSION %s\n" "${SAVERSION_QRESULT}"
+  printf "@@define SA_VERSION_PROCESSED %d\.%03d%03d\n" "${SAVERSION_C1}" "${SAVERSION_C2}" "${SAVERSION_C3}"
+fi
+
+

@@ -30,14 +30,7 @@
 #include "log.h"
 #include "util.h"
 #include "errorcodes.h"
-#ifdef WITH_CURL
-#include "fopen.h"
-#endif
 #include "be.h"
-
-/*for locale support*/
-#include "locale-aide.h"
-/*for locale support*/
 
 
 void* be_init(bool readonly, url_t* u, bool iszipped, bool append, int linenumber, char* filename, char* linebuf) {
@@ -170,18 +163,6 @@ void* be_init(bool readonly, url_t* u, bool iszipped, bool append, int linenumbe
     }
 #endif
   }
-#ifdef WITH_CURL
-  case url_http:
-  case url_https:
-  case url_ftp:
-    {
-      log_msg(LOG_LEVEL_DEBUG,_("opening curl '%s' for %s"),u->value,readonly?"r":"w+");
-      if (iszipped) {
-	return NULL;
-      }
-      return url_fopen(u->value,readonly?"r":"w+");
-    }
-#endif /* WITH CURL */
   default:{
     log_msg(LOG_LEVEL_ERROR, "unsupported backend: %i", u->type);
     return NULL;

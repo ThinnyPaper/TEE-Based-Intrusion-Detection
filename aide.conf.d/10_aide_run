@@ -1,0 +1,10 @@
+# Please note: always remove leading and trailing slashes in path macros
+# var/run -> run
+@@ifndef RUN
+@@define RUN run
+@@endif
+# var/lock -> run/lock
+@@ifndef RUNLOCK
+@@define RUNLOCK run/lock
+@@endif
+

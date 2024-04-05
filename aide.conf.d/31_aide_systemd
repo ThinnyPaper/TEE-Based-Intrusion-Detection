@@ -1,0 +1,45 @@
+@@define RUNSYSD @@{RUN}/systemd
+
+!/@@{RUN}/initctl$ p
+!/@@{RUNSYSD}/initctl$ d
+!/@@{RUNSYSD}/initctl/fifo$ p
+/@@{RUNSYSD}$ d VarDir
+!/@@{RUNSYSD}/fsck\\.progress$ s
+!/@@{RUNSYSD}/cgroups-agent$ s
+!/@@{RUNSYSD}(/(machines|resolve|seats|sessions|shutdown|system|transient|users|ask-password|generator(\\.late)?))?$ d
+!/@@{RUNSYSD}/ask-password-block$ d
+!/@@{RUNSYSD}/ask-password-block/[[:digit:]]+:[[:digit:]]+$ p
+!/@@{RUNSYSD}/generator(\\.late)?/[^/]+\\.(requires|wants)$ d
+!/@@{RUNSYSD}/generator(\\.late)?(/[^/]+\\.(requires|wants))?/[-\\\\_[:alnum:]@.]+\\.(swap|service|mount|sh|timer)$ l
+!/@@{RUNSYSD}/generator(\\.late)?(/[^/]+\\.(requires|wants))?/[-\\\\_[:alnum:]@.]+\\.(swap|service|mount|sh|timer)$ f
+!/@@{RUNSYSD}/inaccessible$ d
+!/@@{RUNSYSD}/inaccessible/blk$ b
+!/@@{RUNSYSD}/inaccessible/chr$ c
+!/@@{RUNSYSD}/inaccessible/dir$ d
+!/@@{RUNSYSD}/inaccessible/fifo$ p
+!/@@{RUNSYSD}/inaccessible/reg$ f
+!/@@{RUNSYSD}/inaccessible/sock$ s
+!/@@{RUNSYSD}/inhibit$ d
+/@@{RUNSYSD}/inhibit/[12]$ f VarFile
+/@@{RUNSYSD}/inhibit/[12]\\.ref$ p
+!/@@{RUNSYSD}/io\\.system\\.ManagedOOM$ s
+!/@@{RUNSYSD}/(notify|private)$ s
+!/@@{RUNSYSD}/propagate$ d
+!/@@{RUNSYSD}/resolve/resolv\\.conf$ f
+!/@@{RUNSYSD}/seats/seat0$ f
+!/@@{RUNSYSD}/sessions/c?[[:digit:]]+$ f
+!/@@{RUNSYSD}/sessions/c?[[:digit:]]+\\.ref$ p
+!/@@{RUNSYSD}/show-status$ f
+!/@@{RUNSYSD}/transient/session-c[0-9]+\\.scope$ f
+!/@@{RUNSYSD}/transient/user-[0-9]+\\.slice$ f
+/@@{RUNSYSD}/unit-root$ d VarDirInode
+/@@{RUNSYSD}/units$ d VarDirInode
+!/@@{RUNSYSD}/units/invocation:(session-c?[0-9]+\\.scope|[-\\\\@:[:alnum:]]+\\.service|([-[:alnum:]]+|\\\\x2d)+\\.(mount|swap))$ l
+/@@{RUNSYSD}/userdb$ d VarDirInode
+/@@{RUNSYSD}/userdb/io\\.systemd\\.(DynamicUser|Machine)$ s VarFile
+/@@{RUN}/tmpfiles\\.d/kmod\\.conf$ f VarFile
+/@@{RUN}/credentials$ d VarDirInode
+!/(var/)?tmp/systemd-private-[[:xdigit:]]{32}-[-[:alnum:]]+\\.service-[[:alnum:]]{6}$ d
+!/(var/)?tmp/systemd-private-[[:xdigit:]]{32}-[-[:alnum:]]+\\.service-[[:alnum:]]{6}/tmp$ d
+!/var/lib/systemd/random-seed$ f
+

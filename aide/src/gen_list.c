@@ -45,9 +45,7 @@
 #include "commandconf.h"
 #include "log.h"
 #include "util.h"
-/*for locale support*/
-#include "locale-aide.h"
-/*for locale support*/
+
 
 #ifdef WITH_MHASH
 #include <mhash.h>
@@ -78,26 +76,6 @@ static int has_md_changed(byte* old,byte* new,int len) {
             ((old!=NULL && new==NULL) ||
              (old==NULL && new!=NULL)));
 }
-
-#ifdef WITH_ACL
-static int has_acl_changed(acl_type* old, acl_type* new) {
-    if (old==NULL && new==NULL) {
-        return RETOK;
-    }
-    if (old==NULL || new==NULL) {
-        return RETFAIL;
-    }
-#ifdef WITH_POSIX_ACL
-    if ((!old->acl_a != !new->acl_a)
-            || (!old->acl_d != !new->acl_d)
-            || (old->acl_a && strcmp(old->acl_a, new->acl_a))
-            || (old->acl_d && strcmp(old->acl_d, new->acl_d))){
-        return RETFAIL;
-    }
-#endif
-    return RETOK;
-}
-#endif
 
 #ifdef WITH_XATTR
 static int cmp_xattr_node(const void *c1, const void *c2)
@@ -153,11 +131,6 @@ static int have_xattrs_changed(xattrs_type* x1,xattrs_type* x2) {
 }
 #endif
 
-#ifdef WITH_E2FSATTRS
-static int has_e2fsattrs_changed(unsigned long old, unsigned long new) {
-    return (old^new);
-}
-#endif
 
 /*
  * Returns the changed attributes for two database lines.
@@ -199,18 +172,10 @@ static DB_ATTR_TYPE get_changed_attributes(db_line* l1,db_line* l2) {
     }
   }
 
-#ifdef WITH_ACL
-    easy_function_compare(ATTR(attr_acl),acl,has_acl_changed);
-#endif
 #ifdef WITH_XATTR
     easy_function_compare(ATTR(attr_xattrs),xattrs,have_xattrs_changed);
 #endif
-#ifdef WITH_SELINUX
-    easy_function_compare(ATTR(attr_selinux),cntx,has_str_changed);
-#endif
-#ifdef WITH_E2FSATTRS
-    easy_function_compare(ATTR(attr_e2fsattrs),e2fsattrs,has_e2fsattrs_changed);
-#endif
+
 #ifdef WITH_CAPABILITIES
     easy_function_compare(ATTR(attr_capabilities),capabilities,has_str_changed);
 #endif
@@ -310,16 +275,6 @@ void strip_dbline(db_line* line)
       }
   }
 
-#ifdef WITH_ACL
-  if(!(attr&ATTR(attr_acl))){
-    if (line->acl)
-    {
-      free(line->acl->acl_a);
-      free(line->acl->acl_d);
-    }
-    checked_free(line->acl);
-  }
-#endif
 #ifdef WITH_XATTR
   if(!(attr&ATTR(attr_xattrs))){
     if (line->xattrs)
@@ -327,17 +282,11 @@ void strip_dbline(db_line* line)
     checked_free(line->xattrs);
   }
 #endif
-#ifdef WITH_SELINUX
-  if(!(attr&ATTR(attr_selinux))){
-    checked_free(line->cntx);
-  }
-#endif
 #ifdef WITH_CAPABILITIES
   if(!(attr&ATTR(attr_capabilities))){
     checked_free(line->capabilities);
   }
 #endif
-  /* e2fsattrs is stripped within e2fsattrs2line in do_md */
 }
 
 /*
@@ -600,24 +549,8 @@ db_line* get_file_attrs(char* filename,DB_ATTR_TYPE attr, struct stat *fs, bool 
   
   fs2db_line(fs,line);
   
-  /*
-    ACL stuff
-  */
-
-#ifdef WITH_ACL
-  acl2line(line);
-#endif
-
 #ifdef WITH_XATTR
   xattrs2line(line);
-#endif
-
-#ifdef WITH_SELINUX
-  selinux2line(line);
-#endif
-
-#ifdef WITH_E2FSATTRS
-    e2fsattrs2line(line);
 #endif
 
 #ifdef WITH_CAPABILITIES
@@ -722,11 +655,6 @@ void hsymlnk(db_line* line) {
   
   if((S_ISLNK(line->perm_o))){
     int len=0;
-#ifdef WITH_ACL   
-    if(conf->no_acl_on_symlinks!=1) {
-      line->attr&=(~ATTR(attr_acl));
-    }
-#endif   
     
     if(conf->warn_dead_symlinks==1) {
       struct stat fs;

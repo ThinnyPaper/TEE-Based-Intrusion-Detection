@@ -1,0 +1,6 @@
+@@define PHPFPMLOGS var/log/php7\\.3-fpm\\.log
+/@@{PHPFPMLOGS}$ f FreqRotLog
+/@@{PHPFPMLOGS}\\.1$ f LowLog
+/@@{PHPFPMLOGS}\\.2\\.gz$ f LoSerMemberLog
+/@@{PHPFPMLOGS}\\.([3456789]|1[01])\\.gz$ f SerMemberLog
+/@@{PHPFPMLOGS}\\.12\\.gz$ f HiSerMemberLog

@@ -1,0 +1,10 @@
+# if your host frequently produces paniclog entries (this happens if
+# spam or virus scanners are in use), set
+# @@define EXIM4_LOGS (main|reject|panic)
+@@define EXIM4_LOGS (main|reject)
+/var/log/exim4/@@{EXIM4_LOGS}log$ f Log
+/var/log/exim4/@@{EXIM4_LOGS}log\\.1$ f LowLog
+/var/log/exim4/@@{EXIM4_LOGS}log\\.2\\.@@{LOGEXT}$ f LoSerMemberLog
+/var/log/exim4/@@{EXIM4_LOGS}log\\.[3-9]\\.@@{LOGEXT}$ f SerMemberLog
+/var/log/exim4/@@{EXIM4_LOGS}log\\.10\\.@@{LOGEXT}$ f HiSerMemberLog
+/var/log/exim4$ d VarDir

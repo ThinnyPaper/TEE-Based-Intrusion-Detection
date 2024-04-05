@@ -1,0 +1,16 @@
+!/@@{RUN}/systemd/journal$ d
+!/@@{RUN}/systemd/journal/(dev-log|socket|stdout|syslog)$ s
+!/@@{RUN}/systemd/journal/flushed$ f
+/@@{RUN}/systemd/journal/kernel-seqnum$ f VarFile
+!/@@{RUN}/systemd/journal/streams$ d
+!/@@{RUN}/systemd/journal/io\\.systemd\\.journal$ s
+!/@@{RUN}/systemd/journal/streams/[[:digit:]]:[[:digit:]]+$ f
+/@@{SYSTEMD_JOURNAL}?$ d VarDirInode
+/@@{SYSTEMD_JOURNAL}/@@{MACHINEID}$ d VarDirInode
+# system\.journal changes acls after reboot (rw->rwx) (see #934284)
+/@@{SYSTEMD_JOURNAL}/@@{MACHINEID}/(system|user-[[:digit:]]+)\\.journal$ f VarFile
+!/@@{SYSTEMD_JOURNAL}/@@{MACHINEID}/(system|user-[[:digit:]]+)@[[:xdigit:]]{32}-[[:xdigit:]]{16}-[[:xdigit:]]{16}\\.journal$ f
+@@ifdef SYSTEMD_JOURNAL_EXTRA
+/@@{SYSTEMD_JOURNAL}/@@{MACHINEID}/@@{SYSTEMD_JOURNAL_EXTRA}\\.journal$ f VarFile
+@@endif
+

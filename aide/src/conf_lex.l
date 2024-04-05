@@ -1,6 +1,6 @@
 C	[^\n\t ]
 
-L	[a-zA-ZöäüßåÖÄÜÅ0-9_%]
+L	[a-zA-Zï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½0-9_%]
 G	[a-zA-Z0-9]
 V	[a-zA-Z_]+[a-zA-Z0-9_]*
 E	[\ ]*"="[\ ]*
@@ -297,12 +297,6 @@ LOG_LEVEL lex_log_level = LOG_LEVEL_CONFIG;
   BEGIN (STRINGEQHUNT);
   return (CONFIGOPTION);
 }
-<CONFIG>"acl_no_symlink_follow" {
-  LOG_LEX_TOKEN(lex_log_level, CONFIGOPTION (ACL_NO_SYMLINK_FOLLOW_OPTION), conftext)
-  conflval.option = ACL_NO_SYMLINK_FOLLOW_OPTION;
-  BEGIN (STRINGEQHUNT);
-  return (CONFIGOPTION);
-}
 
 <CONFIG>"report_level" {
   LOG_LEX_TOKEN(lex_log_level, CONFIGOPTION (REPORT_LEVEL_OPTION), conftext)
@@ -395,13 +389,6 @@ LOG_LEVEL lex_log_level = LOG_LEVEL_CONFIG;
   return (CONFIGOPTION);
 }
 
-<CONFIG>"report_ignore_e2fsattrs" {
-  LOG_LEX_TOKEN(lex_log_level, CONFIGOPTION (REPORT_IGNORE_E2FSATTRS_OPTION), conftext)
-  conflval.option = REPORT_IGNORE_E2FSATTRS_OPTION;
-  BEGIN (STRINGEQHUNT);
-  return (CONFIGOPTION);
-}
-
 <CONFIG>"gzip_dbout" {
   LOG_LEX_TOKEN(lex_log_level, CONFIGOPTION (DATABASE_GZIP_OPTION), conftext)
   conflval.option = DATABASE_GZIP_OPTION;
@@ -412,13 +399,6 @@ LOG_LEVEL lex_log_level = LOG_LEVEL_CONFIG;
 <CONFIG>"root_prefix" {
   LOG_LEX_TOKEN(lex_log_level, CONFIGOPTION (ROOT_PREFIX_OPTION), conftext)
   conflval.option = ROOT_PREFIX_OPTION;
-  BEGIN (STRINGEQHUNT);
-  return (CONFIGOPTION);
-}
-
-<CONFIG>"config_version" {
-  LOG_LEX_TOKEN(lex_log_level, CONFIGOPTION (CONFIG_VERSION), conftext)
-  conflval.option = CONFIG_VERSION;
   BEGIN (STRINGEQHUNT);
   return (CONFIGOPTION);
 }

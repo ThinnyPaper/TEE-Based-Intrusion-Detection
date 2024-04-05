@@ -1,0 +1,59 @@
+@@define ACNGCACHE var/cache/apt-cacher-ng
+@@define ACNGDEB (debrep|secdeb|debian(security)?)
+@@define ACNGDISTS @@{ACNGDEB}/dists/((bookworm|bullseye)(-security)?|(stretch|jessie|buster)([-/]updates)?|sid|stable(-(updates|security))?|testing|unstable|experimental)
+@@define ACNGMNC (main|contrib|non-free)(/dep11)?
+@@define ACNGARCHS (arm64|armhf|amd64|i386|all)
+@@define ACNGDATENR 20[12][[:digit:]]-[[:digit:]]{2}-[[:digit:]]{2}-[[:digit:]]{4}\\.[[:digit:]]{2}
+@@define ACNGDTNR (@@{ACNGDATENR}|T-@@{ACNGDATENR}-F-@@{ACNGDATENR})
+
+/@@{ACNGCACHE}$ d VarDir
+/@@{ACNGCACHE}/_actmp$ d VarDir
+/@@{ACNGCACHE}/_actmp/(combined\\.diff|patch\\.(base|result))$ f VarFile
+/@@{ACNGCACHE}/_(exfail_cnt|expending_(damaged|dat))$ f VarFile
+/@@{ACNGCACHE}/_xstore/qstats/[a-z]$ d VarDir
+!/@@{ACNGCACHE}/_xstore/qstats/([a-z]/)?[0-9]{10}\\.[0-9]{5,6}$ l
+/@@{ACNGCACHE}/_xstore/rsnap/@@{ACNGDISTS}(/@@{ACNGMNC}/binary-@@{ACNGARCHS})?$ d VarDir
+!/@@{ACNGCACHE}/_xstore/rsnap/@@{ACNGDISTS}(/@@{ACNGMNC}/binary-@@{ACNGARCHS})?/[[:digit:]]{22,25}$ f 
+/@@{ACNGCACHE}/@@{ACNGDISTS}$ d VarDir
+/@@{ACNGCACHE}/@@{ACNGDISTS}/(In)?Release(\\.gpg)?(\\.head)?$ f VarFile
+/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/binary-@@{ACNGARCHS}/Release(\\.head)?$ f VarFile
+/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}(/by-hash)?$ d VarDir-n
+!/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/by-hash/SHA256$ d
+!/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/by-hash/SHA256/[[:xdigit:]]{64}(\\.head)?$ f
+/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/source/Sources(\\.xz)?(\\.head)?$ f VarFile
+/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/(source|i18n|(Contents|binary)-@@{ACNGARCHS}\\.diff)$ d VarDir
+/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/(Contents-@@{ACNGARCHS}\\.gz)(\\.head)?$ f VarFile
+!/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/(debian-installer/)?(binary-@@{ACNGARCHS})/(Packages(\\.(bz2|xz))?)(\\.head)?$ f
+/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/i18n/Translation-(de|en)\\.diff$ d VarDir
+/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/(Contents-@@{ACNGARCHS}|Sources\\.diff)$ d VarDir
+!/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/i18n/Translation-(de(_DE)?|en)\\.(bz2|xz)(\\.head)?$ f
+!/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/i18n/Translation-(de|en)(\\.diff)?/Index(\\.head)?$ f
+!/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/Contents-@@{ACNGARCHS}\\.diff/Index(\\.head)?$ f
+!/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/binary-@@{ACNGARCHS}/Packages(\\.diff)?/Index(\\.head)?$ f
+!/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/source/Sources\\.diff/Index(\\.head)?$ f
+/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/Contents-@@{ACNGARCHS}\\.diff(/by-hash)?$ d VarDir-n
+!/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/Contents-@@{ACNGARCHS}\\.diff/by-hash/SHA256$ d
+!/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/Contents-@@{ACNGARCHS}\\.diff/@@{ACNGDTNR}\\.gz(\\.head)?$ f
+!/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/Contents-@@{ACNGARCHS}\\.diff/by-hash/SHA256/[[:xdigit:]]{64}(\\.head)?$ f
+/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/binary-@@{ACNGARCHS}(/Packages\\.diff)?(/by-hash)?$ d VarDir-n
+!/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/binary-@@{ACNGARCHS}(/Packages\\.diff)?/by-hash/SHA256$ d
+!/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/binary-@@{ACNGARCHS}/Packages\\.diff/@@{ACNGDTNR}\\.gz(\\.head)?$ f
+!/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/binary-@@{ACNGARCHS}/(Packages\\.diff/)?by-hash/SHA256/[[:xdigit:]]{64}(\\.head)?$ f
+/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/i18n(/Translation-(en)\\.diff)?(/by-hash)?$ d VarDir-n
+!/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/i18n(/Translation-(en)\\.diff)?/by-hash/SHA256$ d
+!/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/i18n/Translation-(en)\\.diff/@@{ACNGDTNR}\\.gz(\\.head)?$ f
+!/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/i18n(/Translation-(en)\\.diff)?/by-hash/SHA256/[[:xdigit:]]{64}(\\.head)?$ f
+/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/source(/Sources\\.diff)?(/by-hash)?$ d VarDir-n
+!/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/source(/Sources\\.diff)?/by-hash/SHA256$ d
+!/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/source/Sources\\.diff/@@{ACNGDTNR}\\.gz(\\.head)?$ f
+!/@@{ACNGCACHE}/@@{ACNGDISTS}/@@{ACNGMNC}/source(/Sources\\.diff)?/by-hash/SHA256/[[:xdigit:]]{64}(\\.head)?$ f
+!/@@{ACNGCACHE}/@@{ACNGDEB}/pool(/updates)?/@@{ACNGMNC}(/(lib)?[a-z0-9](/[-a-z0-9+\\.]+)?)?$ d
+!/@@{ACNGCACHE}/@@{ACNGDEB}/pool(/updates)?/@@{ACNGMNC}/(lib)?[[:alnum:]]/[-+[:alnum:]\\.]+/[-+[:alnum:]\\.]+_[-+~[:alnum:]\\.]+_@@{ACNGARCHS}\\.deb(\\.head)?$ f
+!/@@{ACNGCACHE}/@@{ACNGDEB}/pool(/updates)?/@@{ACNGMNC}/(lib)?[a-z0-9]/[-+[:alnum:]\\.]+/[-+[:alnum:]\\.]+_[-+~[:alnum:]\\.]+\\.(dsc|(debian|orig)\\.tar\\.(gz|xz))(\\.asc)?(\\.head)?$ f
+
+@@define LOGDIR var/log/apt-cacher-ng
+/@@{LOGDIR}$ d VarDir
+!/@@{LOGDIR}/maint_[[:digit:]]+\\.log\\.html$ f
+/@@{LOGDIR}/apt-cacher\\.(log|err)$ f Log
+!/@@{LOGDIR}/apt-cacher\\.(log|err)-@@{YEAR4D}[[:digit:]]{4}$ f
+

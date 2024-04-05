@@ -1,0 +1,6 @@
+/var/lib/ntp/ntp\\.drift$ f VarFile
+/var/lib/ntp$ d VarDir
+!/var/log/ntpstats/peerstats(\\.[0-9]{8})? f
+!/var/log/ntpstats/loopstats(\\.[0-9]{8})? f
+/var/log/ntpstats$ d VarDir
+/@@{RUN}/ntpd\\.pid$ f VarFile

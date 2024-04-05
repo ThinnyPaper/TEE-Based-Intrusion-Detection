@@ -21,87 +21,36 @@
 #ifndef _TYPES_H_INCLUDED
 #define _TYPES_H_INCLUDED
 
-/* The AC_CHECK_SIZEOF() in configure fails for some machines.
- * we provide some fallback values here */
-#if !SIZEOF_UNSIGNED_SHORT
-#  undef SIZEOF_UNSIGNED_SHORT
-#  define SIZEOF_UNSIGNED_SHORT 2
-#endif
-#if !SIZEOF_UNSIGNED_INT
-#  undef SIZEOF_UNSIGNED_INT
-#  define SIZEOF_UNSIGNED_INT 4
-#endif
-#if !SIZEOF_UNSIGNED_LONG
-#  undef SIZEOF_UNSIGNED_LONG
-#  define SIZEOF_UNSIGNED_LONG 4
-#endif
-
 #include <sys/types.h>
 
-#ifndef HAVE_BYTE
-#  undef byte	    /* maybe there is a macro with this name */
-  typedef unsigned char byte;
-#  define HAVE_BYTE
-#endif
 
+  typedef unsigned char byte;
+
+/*
 #ifndef HAVE_USHORT
-#  undef ushort     /* maybe there is a macro with this name */
+#  undef ushort    
   typedef unsigned short ushort;
 #  define HAVE_USHORT
 #endif
-
+*/
+/*
 #ifndef HAVE_ULONG
-#  undef ulong	    /* maybe there is a macro with this name */
+#  undef ulong	   
   typedef unsigned long ulong;
 #  define HAVE_ULONG
 #endif
+*/
 
-#ifndef HAVE_U16
-#  undef u16	    /* maybe there is a macro with this name */
-#  if SIZEOF_UNSIGNED_INT == 2
-    typedef unsigned int   u16;
-#  elif SIZEOF_UNSIGNED_SHORT == 2
-    typedef unsigned short u16;
-#  else
-#    error no typedef for u16
-#  endif
-#  define HAVE_U16
-#endif
-
-#ifndef HAVE_U32
-#  undef u32	    /* maybe there is a macro with this name */
-#  if SIZEOF_UNSIGNED_INT == 4
-    typedef unsigned int u32;
-#  elif SIZEOF_UNSIGNED_LONG == 4
-    typedef unsigned long u32;
-#  else
-#    error no typedef for u32
-#  endif
-#  define HAVE_U32
-#endif
-
-#ifndef HAVE_U64
-#  undef u64	    /* maybe there is a macro with this name */
-#  if SIZEOF_UNSIGNED_INT == 8
-    typedef unsigned int u64;
-#    define HAVE_U64
-#  elif SIZEOF_UNSIGNED_LONG == 8
-    typedef unsigned long u64;
-#    define HAVE_U64
-#  elif __GNUC__ >= 2 || defined(__SUNPRO_C) || defined(_AIX) && defined(_LONGLONG)
-    typedef unsigned long long u64;
-#    define HAVE_U64
-#  endif
-#endif
+typedef unsigned short u16;
+typedef unsigned int u32;
+typedef unsigned long u64;
 
 typedef union {
     int a;
     short b;
     char c[1];
     long d;
-#  ifdef HAVE_U64
     u64 e;
-#  endif
     float f;
     double g;
 } PROPERLY_ALIGNED_TYPE;

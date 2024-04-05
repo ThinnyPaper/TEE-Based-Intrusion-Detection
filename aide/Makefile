@@ -315,7 +315,6 @@ AIDE_USE_LOCALE =
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
 ATTRLIB = 
-AUDITLIB = 
 AUTOCONF = ${SHELL} '/home/TP/aide/missing' autoconf
 AUTOHEADER = ${SHELL} '/home/TP/aide/missing' autoheader
 AUTOMAKE = ${SHELL} '/home/TP/aide/missing' automake-1.16

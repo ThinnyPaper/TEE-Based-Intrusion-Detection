@@ -212,25 +212,7 @@ static void eval_config_statement(config_option_statement statement, int linenum
 #endif
             break;
         BOOL_CONFIG_OPTION_CASE(DATABASE_ADD_METADATA_OPTION, database_add_metadata)
-        case ACL_NO_SYMLINK_FOLLOW_OPTION:
-#ifdef WITH_ACL
-            b = string_expression_to_bool(statement.e, linenumber, filename, linebuf);
-            conf->no_acl_on_symlinks=b;
-#else
-            LOG_CONFIG_FORMAT_LINE(LOG_LEVEL_ERROR, %s, "acl support not compiled in, recompile AIDE with '--with-posix-acl'")
-            exit(INVALID_CONFIGURELINE_ERROR);
-#endif
-            break;
-        case REPORT_IGNORE_E2FSATTRS_OPTION:
-#ifdef WITH_E2FSATTRS
-            str = eval_string_expression(statement.e, linenumber, filename, linebuf);
-            do_report_ignore_e2fsattrs(str, linenumber, filename, linebuf);
-            free(str);
-#else
-            LOG_CONFIG_FORMAT_LINE(LOG_LEVEL_ERROR, %s, "e2fsattrs support not compiled in, recompile AIDE with '--with-e2fsattrs'")
-            exit(INVALID_CONFIGURELINE_ERROR);
-#endif
-            break;
+
         BOOL_CONFIG_OPTION_CASE(REPORT_BASE16_OPTION, report_base16)
         BOOL_CONFIG_OPTION_CASE(REPORT_DETAILED_INIT_OPTION, report_detailed_init)
         BOOL_CONFIG_OPTION_CASE(REPORT_GROUPED_OPTION, report_grouped)
@@ -264,11 +246,6 @@ static void eval_config_statement(config_option_statement statement, int linenum
                 }
             }
             free(str);
-            break;
-        case CONFIG_VERSION:
-            str = eval_string_expression(statement.e, linenumber, filename, linebuf);
-            conf->config_version = str;
-            LOG_CONFIG_FORMAT_LINE(LOG_LEVEL_CONFIG, set 'config_version' option to '%s', str)
             break;
         case VERBOSE_OPTION:
             log_msg(LOG_LEVEL_ERROR, "%s:%d: 'verbose' option is no longer supported, use 'log_level' and 'report_level' options instead (see man aide.conf for details) (line: '%s')", conf_filename, conf_linenumber, conf_linebuf);

@@ -36,9 +36,7 @@
 #include "base64.h"
 #include "util.h"
 #include "log.h"
-/*for locale support*/
-#include "locale-aide.h"
-/*for locale support*/
+
 
 char tob64[] = 
 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";

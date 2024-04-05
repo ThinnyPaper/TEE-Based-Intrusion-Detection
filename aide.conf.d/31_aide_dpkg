@@ -1,0 +1,17 @@
+@@define DPKG_LOGS (alternatives|dpkg)\\.log
+@@define DPKG_BACKUPS (alternatives\\.tar|dpkg\\.(status|diversions|statoverride|arch))
+/var/lib/dpkg/(available|status)(-old)?$ f VarFile
+/var/lib/dpkg/status\\.yesterday(\\.[0-9]*)?(\\.gz)?$ f VarFile
+/var/lib/dpkg/triggers/Lock$ f VarFile
+/var/lib/dpkg(/(info|updates))?$ d VarDir
+/var/lib/dpkg/lock$ f VarFile
+/var/log/@@{DPKG_LOGS}$ f Log
+/var/log/@@{DPKG_LOGS}\\.1$ f LowLog
+/var/log/@@{DPKG_LOGS}\\.2\\.@@{LOGEXT}$ f LoSerMemberLog
+/var/log/@@{DPKG_LOGS}\\.([3-9]|1[01])\\.@@{LOGEXT}$ f SerMemberLog
+/var/log/@@{DPKG_LOGS}\\.12\\.@@{LOGEXT}$ f HiSerMemberLog
+/var/backups/@@{DPKG_BACKUPS}\\.0$ f LowLog
+/var/backups/@@{DPKG_BACKUPS}\\.1\\.gz$ f LoSerMemberLog
+/var/backups/@@{DPKG_BACKUPS}\\.[2345]\\.gz$ f SerMemberLog
+/var/backups/@@{DPKG_BACKUPS}\\.6\\.gz$ f HiSerMemberLog
+

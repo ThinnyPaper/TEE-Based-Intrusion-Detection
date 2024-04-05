@@ -42,9 +42,6 @@
 #include "conf_yacc.h"
 #include "util.h"
 #include "commandconf.h"
-/*for locale support*/
-#include "locale-aide.h"
-/*for locale support*/
 
 #ifdef WITH_MHASH
 #include <mhash.h>

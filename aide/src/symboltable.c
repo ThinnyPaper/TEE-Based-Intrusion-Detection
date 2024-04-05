@@ -23,9 +23,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "symboltable.h"
-/*for locale support*/
-#include "locale-aide.h"
-/*for locale support*/
+
 
 list* list_find(char* s,list* item){
 

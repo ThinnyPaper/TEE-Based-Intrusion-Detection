@@ -25,9 +25,6 @@
 #include <string.h>
 #include <time.h>
 #include <math.h>
-#ifdef WITH_AUDIT
-#include <libaudit.h>
-#endif
 #ifdef HAVE_SYSLOG
 #include <syslog.h>
 #endif
@@ -44,9 +41,6 @@
 #include "commandconf.h"
 #include "gen_list.h"
 #include "report.h"
-/*for locale support*/
-#include "locale-aide.h"
-/*for locale support*/
 
 #include "md.h"
 
@@ -58,9 +52,6 @@ const int width_details = 80;
 const char time_format[] = "%Y-%m-%d %H:%M:%S %z";
 const int time_string_len = 26;
 
-#ifdef WITH_AUDIT
-long nadd, nrem, nchg = 0;
-#endif
 int added_entries_reported, removed_entries_reported, changed_entries_reported = 0;
 
 const char* report_top_format = "\n\n---------------------------------------------------\n%s:\n---------------------------------------------------\n";
@@ -79,17 +70,8 @@ const ATTRIBUTE report_attrs_order[] = {
     attr_inode,
     attr_linkcount,
     attr_allhashsums,
-#ifdef WITH_ACL
-   attr_acl,
-#endif
 #ifdef WITH_XATTR
    attr_xattrs,
-#endif
-#ifdef WITH_SELINUX
-   attr_selinux,
-#endif
-#ifdef WITH_E2FSATTRS
-   attr_e2fsattrs,
 #endif
 #ifdef WITH_CAPABILITIES
    attr_capabilities,
@@ -106,53 +88,6 @@ static DB_ATTR_TYPE get_attrs(ATTRIBUTE attr) {
     }
 }
 
-#ifdef WITH_E2FSATTRS
-    /* flag->character mappings taken from lib/e2p/pf.c (git commit c46b57b)
-     * date: 2015-05-10
-     * sources: git://git.kernel.org/pub/scm/fs/ext2/e2fsprogs.git
-     *
-     * on update see also do_e2fsattrs in commandconf.c
-     */
-    unsigned long flag_bits[] = { EXT2_SECRM_FL, EXT2_UNRM_FL, EXT2_SYNC_FL, EXT2_DIRSYNC_FL, EXT2_IMMUTABLE_FL,
-        EXT2_APPEND_FL, EXT2_NODUMP_FL, EXT2_NOATIME_FL, EXT2_COMPR_FL, EXT2_COMPRBLK_FL,
-        EXT2_DIRTY_FL, EXT2_NOCOMPR_FL,
-#ifdef EXT2_ECOMPR_FL
-        EXT2_ECOMPR_FL,
-#else
-        EXT4_ENCRYPT_FL,
-#endif
-        EXT3_JOURNAL_DATA_FL, EXT2_INDEX_FL,
-        EXT2_NOTAIL_FL, EXT2_TOPDIR_FL
-#ifdef EXT4_EXTENTS_FL
-        , EXT4_EXTENTS_FL
-#endif
-#ifdef EXT4_HUGE_FILE_FL
-        , EXT4_HUGE_FILE_FL
-#endif
-#ifdef FS_NOCOW_FL
-    , FS_NOCOW_FL
-#endif
-#ifdef EXT4_INLINE_DATA_FL
-    , EXT4_INLINE_DATA_FL
-#endif
-
-    };
-    char flag_char[] = { 's', 'u', 'S', 'D', 'i', 'a', 'd', 'A', 'c', 'B', 'Z', 'X', 'E', 'j', 'I', 't', 'T'
-#ifdef EXT4_EXTENTS_FL
-    , 'e'
-#endif
-#ifdef EXT4_HUGE_FILE_FL
-    , 'h'
-#endif
-#ifdef FS_NOCOW_FL
-    , 'C'
-#endif
-#ifdef EXT4_INLINE_DATA_FL
-    , 'N'
-#endif
-    };
-/*************/
-#endif
 
 typedef struct report_t {
     url_t* url;
@@ -166,10 +101,6 @@ typedef struct report_t {
     int summarize_changes;
     int grouped;
     bool append;
-
-#ifdef WITH_E2FSATTRS
-    long ignore_e2fsattrs;
-#endif
 
     DB_ATTR_TYPE ignore_added_attrs;
     DB_ATTR_TYPE ignore_removed_attrs;
@@ -251,55 +182,7 @@ static int xattrs2array(xattrs_type* xattrs, char* **values) {
 }
 #endif
 
-#ifdef WITH_ACL
-static int acl2array(acl_type* acl, char* **values) {
-    int n = 0;
-#ifdef WITH_POSIX_ACL
-#define easy_posix_acl(x,y) \
-        if (acl->x) { \
-            i = k = 0; \
-            while (acl->x[i]) { \
-                if (acl->x[i]=='\n') { \
-                    (*values)[j]=checked_malloc(4+(i-k)*sizeof(char)); \
-                    snprintf((*values)[j], 4+(i-k), "%c: %s", y, &acl->x[k]); \
-                    j++; \
-                    k=i+1; \
-                } \
-                i++; \
-            } \
-        }
-    if (acl->acl_a || acl->acl_d) {
-        int j, k, i;
-        if (acl->acl_a) { i = 0; while (acl->acl_a[i]) { if (acl->acl_a[i++]=='\n') { n++; } } }
-        if (acl->acl_d) { i = 0; while (acl->acl_d[i]) { if (acl->acl_d[i++]=='\n') { n++; } } }
-        *values = checked_malloc(n * sizeof(char*));
-        j = 0;
-        easy_posix_acl(acl_a, 'A')
-        easy_posix_acl(acl_d, 'D')
-    }
-#endif
-    return n;
-}
-#endif
 
-#ifdef WITH_E2FSATTRS
-static char* e2fsattrs2string(unsigned long flags, int flags_only, unsigned long ignore_e2fsattrs) {
-    int length = sizeof(flag_bits)/sizeof(long);
-    char* string = checked_malloc ((length+1) * sizeof (char));
-    int j = 0;
-    for (int i = 0 ; i < length ; i++) {
-        if (!flags_only && flag_bits[i]&ignore_e2fsattrs) {
-            string[j++]=':';
-        } else if (flag_bits[i] & flags) {
-            string[j++]=flag_char[i];
-        } else if (!flags_only) {
-            string[j++]='-';
-        }
-    }
-    string[j] = '\0';
-    return string;
-}
-#endif
 
 static char* get_file_type_string(mode_t mode) {
     switch (mode & S_IFMT) {
@@ -440,10 +323,6 @@ void log_report_urls(LOG_LEVEL log_level) {
         free(str);
         log_msg(log_level, "   force_attrs: '%s'", str = diff_attributes(0, r->force_attrs));
         free(str);
-#ifdef WITH_E2FSATTRS
-        log_msg(log_level, "   ignore_e2fsattrs: '%s'", str = e2fsattrs2string(r->ignore_e2fsattrs, 1, 0));
-        free(str);
-#endif
     }
 }
 
@@ -490,11 +369,6 @@ bool add_report_url(url_t* url, int linenumber, char* filename, char* linebuf) {
     r->linenumber = linenumber;
     r->filename = filename;
     r->linebuf = linebuf?checked_strdup(linebuf):NULL;
-
-#ifdef WITH_E2FSATTRS
-    r->ignore_e2fsattrs = conf->report_ignore_e2fsattrs;
-#endif
-
     log_msg(LOG_LEVEL_DEBUG, _("add report_url (%p): url(: %s:%s, level: %d"), r, get_url_type_string((r->url)->type), (r->url)->value, r->level);
     conf->report_urls=list_sorted_insert(conf->report_urls, (void*) r, compare_report_t_by_report_level);
     return true;
@@ -511,7 +385,7 @@ bool init_report_urls() {
         int sfac;
         case url_syslog: {
             sfac=syslog_facility_lookup(r->url->value);
-            openlog(AIDE_IDENT,AIDE_LOGOPT, sfac);
+            openlog("idtt",LOG_CONS, sfac);
             break;
         }
 #endif
@@ -558,10 +432,6 @@ snprintf(*values[0], l, "%s",s);
     if (line==NULL || !(line->attr&attr)) {
         *values = NULL;
         return 0;
-#ifdef WITH_ACL
-    } else if (ATTR(attr_acl)&attr) {
-        return acl2array(line->acl, values);
-#endif
 #ifdef WITH_XATTR
     } else if (ATTR(attr_xattrs)&attr) {
         return xattrs2array(line->xattrs, values);
@@ -584,14 +454,7 @@ snprintf(*values[0], l, "%s",s);
         easy_number(ATTR(attr_gid),gid,"%li")
         easy_number(ATTR(attr_inode),inode,"%li")
         easy_number(ATTR(attr_linkcount),nlink,"%li")
-#ifdef WITH_SELINUX
-        } else if (ATTR(attr_selinux)&attr) {
-            easy_string(line->cntx)
-#endif
-#ifdef WITH_E2FSATTRS
-        } else if (ATTR(attr_e2fsattrs)&attr) {
-            *values[0]=e2fsattrs2string(line->e2fsattrs, 0, r->ignore_e2fsattrs);
-#endif
+
 #ifdef WITH_CAPABILITIES
         } else if (ATTR(attr_capabilities)&attr) {
             easy_string(line->capabilities)
@@ -625,11 +488,7 @@ if ((conf->action&(DO_COMPARE|DO_DIFF) || (conf->action&DO_INIT && r->detailed_i
    && (r->grouped == grouped && node->checked&node_status) ) {
 
         if (r->level >= REPORT_LEVEL_LIST_ENTRIES) {
-            if (!(node->changed_attrs) || ~(r->ignore_changed_attrs)&(node->changed_attrs
-#ifdef WITH_E2FSATTRS
-                & (~ATTR(attr_e2fsattrs) | (node->changed_attrs&ATTR(attr_e2fsattrs) && ~(r->ignore_e2fsattrs)&(node->old_data->e2fsattrs^node->new_data->e2fsattrs)?ATTR(attr_e2fsattrs):0))
-#endif
-            )) {
+            if (!(node->changed_attrs) || ~(r->ignore_changed_attrs)&(node->changed_attrs)) {
 
     if(r->summarize_changes) {
         int i;
@@ -746,11 +605,7 @@ static void print_dbline_attributes(REPORT_LEVEL report_level, db_line* oline, d
         added_attrs = oline&&nline?(~(oline->attr)&nline->attr&~(r->ignore_added_attrs)):0;
         removed_attrs = oline&&nline?(oline->attr&~(nline->attr)&~(r->ignore_removed_attrs)):0;
 
-        changed_attrs = ~(r->ignore_changed_attrs)&(attrs
-#ifdef WITH_E2FSATTRS
-        & (~ATTR(attr_e2fsattrs) | ( (attrs&ATTR(attr_e2fsattrs) && oline != NULL && nline != NULL && ~(r->ignore_e2fsattrs)&(oline->e2fsattrs^nline->e2fsattrs)) ? ATTR(attr_e2fsattrs) : 0 ) )
-#endif
-);
+        changed_attrs = ~(r->ignore_changed_attrs)&(attrs);
         forced_attrs = (oline && nline)?r->force_attrs:attrs;
 
         report_attrs=changed_attrs?forced_attrs|changed_attrs:0;
@@ -808,9 +663,6 @@ static void terse_report(seltree* node) {
             /* File is in new db but not old. (ADDED) */
             /* unless it was moved in */
             if ( (conf->action&DO_INIT && r->detailed_init) || (conf->action&(DO_COMPARE|DO_DIFF) && !((node->checked&NODE_ALLOW_NEW)||(node->checked&NODE_MOVED_IN))) ) {
-#ifdef WITH_AUDIT
-                nadd++;
-#endif
                 r->nadd++;
                 node->checked|=NODE_ADDED;
             }
@@ -818,9 +670,7 @@ static void terse_report(seltree* node) {
             /* File is in old db but not new. (REMOVED) */
             /* unless it was moved out */
             if (!((node->checked&NODE_ALLOW_RM)||(node->checked&NODE_MOVED_OUT))) {
-#ifdef WITH_AUDIT
-                nrem++;
-#endif
+
                 r->nrem++;
                 node->checked|=NODE_REMOVED;
             }
@@ -835,27 +685,14 @@ static void terse_report(seltree* node) {
                     free(str);
                 }
                 DB_ATTR_TYPE changed_attrs = (node->changed_attrs)&~(r->ignore_changed_attrs);
-                if (changed_attrs
-#ifdef WITH_E2FSATTRS
-                    &~ATTR(attr_e2fsattrs) || (changed_attrs&ATTR(attr_e2fsattrs) && ~(r->ignore_e2fsattrs)&(node->old_data->e2fsattrs^node->new_data->e2fsattrs))
-#endif
-                ) {
+                if (changed_attrs) {
                     r->nchg++;
                     node->checked|=NODE_CHANGED;
                 }
-#ifdef WITH_AUDIT
-                nchg++;
-#endif
             }else if (!((node->checked&NODE_ALLOW_NEW)||(node->checked&NODE_MOVED_IN))) {
-#ifdef WITH_AUDIT
-                nadd++;
-#endif
                 r->nadd++;
                 node->checked|=NODE_ADDED;
             }else if (!((node->checked&NODE_ALLOW_RM)||(node->checked&NODE_MOVED_OUT))) {
-#ifdef WITH_AUDIT
-                nrem++;
-#endif
                 r->nrem++;
                 node->checked|=NODE_REMOVED;
             }
@@ -972,12 +809,6 @@ static void print_report_header() {
                 free(str);
             }
 
-#ifdef WITH_E2FSATTRS
-            if (r->level >= REPORT_LEVEL_LIST_ENTRIES && r->ignore_e2fsattrs) {
-                report_printf(r,_("Ignored e2fs attributes: %s\n"), str = e2fsattrs2string(r->ignore_e2fsattrs, 1, 0) );
-                free(str);
-            }
-#endif
             if (r->level >= REPORT_LEVEL_SUMMARY) {
                 if(conf->action&(DO_COMPARE|DO_DIFF) && (r->nadd||r->nrem||r->nchg)) {
                     report_printf(r,_("\nSummary:\n  Total number of entries:\t%li\n  Added entries:\t\t%li\n"
@@ -1014,30 +845,6 @@ static void print_report_footer()
   free(time); time=NULL;
 }
 
-#ifdef WITH_AUDIT
-  /* Something changed, send audit anomaly message */
-void send_audit_report()
-{
-  if(nadd!=0||nrem!=0||nchg!=0){
-    int fd=audit_open();
-    if (fd>=0){
-       char msg[64];
-
-       snprintf(msg, sizeof(msg), "added=%ld removed=%ld changed=%ld", 
-                nadd, nrem, nchg);
-
-       if (audit_log_user_message(fd, AUDIT_ANOM_RBAC_INTEGRITY_FAIL,
-                                  msg, NULL, NULL, NULL, 0)<=0)
-#ifdef HAVE_SYSLOG
-          syslog(LOG_ERR, "Failed sending audit message:%s", msg);
-#else
-          ;
-#endif
-       close(fd);
-    }
-  }
-}
-#endif /* WITH_AUDIT */
 
 static void print_list_header(const int node_status) {
     list* l = NULL;
@@ -1072,9 +879,6 @@ static void print_detailed_header() {
 int gen_report(seltree* node) {
 
     terse_report(node);
-#ifdef WITH_AUDIT
-    send_audit_report();
-#endif
     print_report_header();
     print_list_header(NODE_ADDED);
     print_report_list(node, 1, NODE_ADDED);

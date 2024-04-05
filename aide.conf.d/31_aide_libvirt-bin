@@ -1,0 +1,24 @@
+@@ifndef LIBVIRT_QEMU_GUESTS
+@@define LIBVIRT_QEMU_GUESTS ()
+@@endif
+/var/lib/libvirt$ d VarDir
+/var/(lib|cache)/libvirt/qemu$ d VarDir-n
+/var/lib/libvirt/qemu/(channel(/target)?|dump|nvram|save|snapshot)$ d VarDir-n
+!/var/lib/libvirt/qemu(/channel/target)?/domain-[[:digit:]]+-@@{LIBVIRT_QEMU_GUESTS}$ d
+!/var/lib/libvirt/qemu/domain-[[:digit:]]+-@@{LIBVIRT_QEMU_GUESTS}/master-key\\.aes$ f
+!/var/lib/libvirt/qemu(/channel/target)?/domain-[[:digit:]]+-@@{LIBVIRT_QEMU_GUESTS}/(monitor\\.sock|org\\.qemu\\.guest_agent\\.0)$ s
+/var/log/libvirt$ d VarDir
+/var/log/libvirt/qemu/@@{LIBVIRT_QEMU_GUESTS}\\.log$ f Log
+/var/log/libvirt/qemu/@@{LIBVIRT_QEMU_GUESTS}\\.log\\.1$ f LowLog
+/var/log/libvirt/qemu/@@{LIBVIRT_QEMU_GUESTS}\\.log\\.2\\.@@{LOGEXT}$ f LoSerMemberLog
+/var/log/libvirt/qemu/@@{LIBVIRT_QEMU_GUESTS}\\.log\\.3\\.@@{LOGEXT}$ f SerMemberLog
+/var/log/libvirt/qemu/@@{LIBVIRT_QEMU_GUESTS}\\.log\\.4\\.@@{LOGEXT}$ f HiSerMemberLog
+/@@{RUN}/(libvirtd|virtlogd)\\.pid$ f VarFile
+/@@{RUN}/libvirt(/(qemu|uml-guest))?$ d VarDirInode
+/@@{RUN}/libvirt/(hostdevmgr|lxc|network|storage)$ d VarDirInode
+/@@{RUN}/libvirt/network/nwfilter\\.leases$ f VarFile
+/@@{RUN}/libvirt/network/br[[:digit:]]{1,3}\\.xml$ f VarFile
+/@@{RUN}/libvirt/(libvirt-(admin-sock|sock(-ro)?)|virt(lock|log)d-sock)$ s VarFile
+!/@@{RUN}/libvirt/qemu/@@{LIBVIRT_QEMU_GUESTS}\\.(pid|xml)$ f
+/@@{RUNLOCK}/libvirt-guests$ f VarDirInode
+

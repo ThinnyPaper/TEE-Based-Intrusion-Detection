@@ -40,9 +40,6 @@
 #include "gen_list.h"
 #include "util.h"
 #include "commandconf.h"
-/*for locale support*/
-#include "locale-aide.h"
-/*for locale support*/
 
 #ifdef WITH_MHASH
 #include <mhash.h>
@@ -517,35 +514,6 @@ int db_writespec_file(db_config* dbconf)
   return RETOK;
 }
 
-#ifdef WITH_ACL
-int db_writeacl(acl_type* acl,FILE* file,int a)
-{
-#ifdef WITH_POSIX_ACL
-  if(a) {
-    dofprintf(" ");
-  }
-  
-  if (acl==NULL) {
-    dofprintf("0");
-  } else {    
-    dofprintf("POSIX"); /* This is _very_ incompatible */
-
-    dofprintf(",");
-    if (acl->acl_a)
-      db_write_byte_base64((byte*)acl->acl_a, 0, file,0,1,1);
-    else
-      dofprintf("0");
-    dofprintf(",");
-    if (acl->acl_d)
-      db_write_byte_base64((byte*)acl->acl_d, 0, file,0,1,1);
-    else
-      dofprintf("0");
-  }
-#endif
-  return RETOK;
-}
-#endif
-
 
 #define WRITE_HASHSUM(x) \
 case attr_ ##x : { \
@@ -629,12 +597,6 @@ int db_writeline_file(db_line* line,db_config* dbconf, url_t* url){
       db_write_attr(line->attr, dbconf->database_out.fp,i);
       break;
     }
-#ifdef WITH_ACL
-    case attr_acl : {
-      db_writeacl(line->acl,dbconf->database_out.fp,i);
-      break;
-    }
-#endif
     case attr_xattrs : {
         xattr_node *xattr = NULL;
         size_t num = 0;
@@ -660,16 +622,7 @@ int db_writeline_file(db_line* line,db_config* dbconf, url_t* url){
         }
       break;
     }
-    case attr_selinux : {
-	db_write_byte_base64((byte*)line->cntx, 0, dbconf->database_out.fp, i, 1, 1);
-      break;
-    }
-#ifdef WITH_E2FSATTRS
-    case attr_e2fsattrs : {
-      db_writelong(line->e2fsattrs,dbconf->database_out.fp,i);
-      break;
-    }
-#endif
+
 #ifdef WITH_CAPABILITIES
     case attr_capabilities : {
       db_write_byte_base64((byte*)line->capabilities, 0, dbconf->database_out.fp, i, 1, 1);

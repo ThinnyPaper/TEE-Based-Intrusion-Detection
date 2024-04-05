@@ -52,7 +52,6 @@ static diff_attributes_t diff_attributes_tests[] = {
     { 0, ATTR(attr_gostr3411_94), "gost" },
     { 0, ATTR(attr_crc32b), "crc32b" },
     /* { 0, ATTR(attr_attr), "attr" }, */
-    { 0, ATTR(attr_acl), "acl" },
     /* { 0, ATTR(attr_bsize), "bsize" }, */
     /* { 0, ATTR(attr_rdev), "rdev" }, */
     /* { 0, ATTR(attr_dev), "dev" }, */
@@ -63,11 +62,9 @@ static diff_attributes_t diff_attributes_tests[] = {
     { 0, ATTR(attr_allowrmfile), "ARF" },
     { 0, ATTR(attr_sha256), "sha256" },
     { 0, ATTR(attr_sha512), "sha512" },
-    { 0, ATTR(attr_selinux), "selinux" },
     { 0, ATTR(attr_xattrs), "xattrs" },
     { 0, ATTR(attr_whirlpool), "whirlpool" },
     { 0, ATTR(attr_ftype), "ftype" },
-    { 0, ATTR(attr_e2fsattrs), "e2fsattrs" },
     { 0, ATTR(attr_capabilities), "caps" },
 
     { 0, ATTR(attr_linkname)|ATTR(attr_perm), "l+p" },

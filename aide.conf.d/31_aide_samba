@@ -1,0 +1,19 @@
+/@@{RUN}/samba/(smbd_clientupd|leases|names|printer_list|serverid|smbXsrv_((open|session|tcon|version)_global))\\.tdb$ f VarFile
+!/@@{RUN}/samba/(smbd_cleanupd|smbXsrv_((client)_global))\\.tdb$ f
+/@@{RUN}/samba/smbd\\.pid$ f VarFile
+/@@{RUN}/samba/(msg\\.lock|nmbd)$ d VarDirInode
+/run/samba/msg.lock/[[:digit:]]+$ f VarFile
+/@@{RUN}/samba/(ncalrpc(/np)?)$ d VarDirInode
+!/@@{RUN}/samba/ncalrpc/np/spoolss$ s
+/@@{RUN}/samba/nmbd/unexpected$ s VarFile
+!/@@{RUN}/samba/namelist\\.debug$ f
+/var/cache/samba$ d VarDir
+/var/cache/samba/(browse\\.dat|gencache\\.tdb)$ f VarFile
+/var/log/samba$ d VarDir
+/var/log/samba/log\\.[sn]mbd$ f Log
+/var/log/samba/log\\.[sn]mbd\\.1$ f LowLog
+/var/log/samba/log\\.[sn]mbd\\.2.@@{LOGEXT}$ f LoSerMemberLog
+/var/log/samba/log\\.[sn]mbd\\.[23456]\\.@@{LOGEXT}$ f SerMemberLog
+/var/log/samba/log\\.[sn]mbd\\.7.@@{LOGEXT}$ f HiSerMemberLog
+/var/lib/samba/private/msg\\.sock$ d VarDir
+!/var/lib/samba/private/msg\\.sock/[[:digit:]]+$ s

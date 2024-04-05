@@ -34,18 +34,6 @@
 
 #include "list.h"
 
-#ifdef WITH_POSIX_ACL /* POSIX acl works for Sun ACL, AIUI but anyway... */
-#include <sys/acl.h>
-#ifndef WITH_ACL
-# error "No ACL support ... but POSIX ACL support."
-#endif
-#endif
-
-typedef struct acl_type {
- char *acl_a; /* ACCESS */
- char *acl_d; /* DEFAULT, directories only */
-} acl_type;
-
 #ifdef WITH_XATTR /* Do generic user Xattrs. */
 #include <sys/xattr.h>
 #include <attr/attributes.h>
@@ -67,17 +55,6 @@ typedef struct xattrs_type
   size_t sz;
   struct xattr_node *ents;
 } xattrs_type;
-
-#ifdef WITH_SELINUX
-#include <selinux/selinux.h>
-#ifndef ENOATTR
-# define ENOATTR ENODATA 
-#endif
-#endif
-
-#ifdef WITH_E2FSATTRS
-#include <e2p/e2p.h>
-#endif
 
 #ifdef WITH_CAPABILITIES
 #include <sys/capability.h>
@@ -135,7 +112,6 @@ typedef struct xattrs_type
 typedef struct db_line {
   byte* hashsums[num_hashes];
 
-  acl_type* acl;
   /* Something here.. */
 
   mode_t perm;
@@ -158,7 +134,6 @@ typedef struct db_line {
 
   xattrs_type* xattrs;
 
-  unsigned long e2fsattrs;
 
   char* capabilities;
 
@@ -222,10 +197,6 @@ typedef struct db_config {
   DB_ATTR_TYPE report_ignore_changed_attrs;
   DB_ATTR_TYPE report_force_attrs;
 
-#ifdef WITH_E2FSATTRS
-  unsigned long report_ignore_e2fsattrs;
-#endif
-
   list* report_urls;
   REPORT_LEVEL report_level;
 
@@ -246,9 +217,6 @@ typedef struct db_config {
   int symlinks_found;
   DB_ATTR_TYPE attr;
 
-#ifdef WITH_ACL  
-  int no_acl_on_symlinks;
-#endif
   int warn_dead_symlinks;
 
   int report_grouped;

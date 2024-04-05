@@ -29,9 +29,6 @@
 #include "db_disk.h"
 #include "md.h"
 
-#ifdef WITH_CURL
-#include "fopen.h"
-#endif
 
 #include "db_config.h"
 #include "log.h"
@@ -43,9 +40,6 @@
 
 #include "base64.h"
 #include "util.h"
-/*for locale support*/
-#include "locale-aide.h"
-/*for locale support*/
 
 db_line* db_char2line(char**, database*);
 
@@ -232,9 +226,7 @@ db_line* db_char2line(char** ss, database* db){
   line->filename=NULL;
   line->fullpath=NULL;
   line->linkname=NULL;
-  line->acl=NULL;
   line->xattrs=NULL;
-  line->e2fsattrs=0;
   line->cntx=NULL;
   line->capabilities=NULL;
 
@@ -311,31 +303,6 @@ db_line* db_char2line(char** ss, database* db){
     CHAR2HASH(gostr3411_94)
     CHAR2HASH(stribog256)
     CHAR2HASH(stribog512)
-    case attr_acl : {
-#ifdef WITH_POSIX_ACL
-      char *tval = NULL;
-      
-      tval = strtok(ss[db->fields[i]], ",");
-
-      line->acl = NULL;
-
-      if (tval[0] == '0')
-        line->acl = NULL;
-      else if (!strcmp(tval, "POSIX"))
-      {
-        line->acl = checked_malloc(sizeof(acl_type));
-        line->acl->acl_a = NULL;
-        line->acl->acl_d = NULL;
-        
-        tval = strtok(NULL, ",");
-        line->acl->acl_a = (char *)base64tobyte(tval, strlen(tval), NULL);
-        tval = strtok(NULL, ",");
-        line->acl->acl_d = (char *)base64tobyte(tval, strlen(tval), NULL);
-      }
-      /* else, it's broken... */
-#endif
-      break;
-    }
       case attr_xattrs : {
         size_t num = 0;
         char *tval = NULL;
@@ -366,14 +333,6 @@ db_line* db_char2line(char** ss, database* db){
         }
         break;
       }
-
-      case attr_selinux : {
-        byte  *val = NULL;
-        
-        val = base64tobyte(ss[db->fields[i]], strlen(ss[db->fields[i]]),NULL);
-        line->cntx = (char *)val;
-        break;
-      }
       
     case attr_perm : {
       line->perm=readoct(ss[db->fields[i]], db, "permissions");
@@ -387,11 +346,6 @@ db_line* db_char2line(char** ss, database* db){
 
     case attr_attr : {
       line->attr=readlonglong(ss[db->fields[i]], db, "attr");
-      break;
-    }
-    
-    case attr_e2fsattrs : {
-      line->e2fsattrs=readlong(ss[db->fields[i]], db, "e2fsattrs");
       break;
     }
 
@@ -503,17 +457,6 @@ void db_close() {
     }
     break;
   }
-  case url_http:
-  case url_https:
-  case url_ftp:
-    {
-#ifdef WITH_CURL
-        if (conf->database_out.fp!=NULL) {
-            url_fclose(conf->database_out.fp);
-        }
-#endif /* WITH CURL */
-      break;
-    }
   /* unsupported database types */
   case url_syslog: {
     /* do nothing */
@@ -541,15 +484,6 @@ void free_db_line(db_line* dl)
   dl->filename=NULL;
   checked_free(dl->fullpath);
   checked_free(dl->linkname);
-  
-  if (dl->acl)
-  {
-#ifdef WITH_ACL
-    free(dl->acl->acl_a);
-    free(dl->acl->acl_d);
-#endif
-  }
-  checked_free(dl->acl);
   
   if (dl->xattrs)
     free(dl->xattrs->ents);

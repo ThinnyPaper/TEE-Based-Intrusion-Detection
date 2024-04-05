@@ -23,7 +23,6 @@
 #include "list.h"
 #include "log.h"
 #include "util.h"
-/*for locale support*/
 
 /* list
  * limitations:
@@ -159,7 +158,7 @@ list* list_delete_item(list* item){
   if (item->header->head==item->header->tail) {
     /*
      * Ollaan poistamassa listan ainoaa alkiota.
-     * Tällöin palautetaan NULL
+     * Tï¿½llï¿½in palautetaan NULL
      */
     free(item->header);
     free(item);
@@ -167,11 +166,11 @@ list* list_delete_item(list* item){
   }
   
   /* 
-   * Nyt meillä on listassa ainakin kaksi alkiota 
+   * Nyt meillï¿½ on listassa ainakin kaksi alkiota 
    *  
    */
 
-  /* poistetaan listan viimeistä alkiota */
+  /* poistetaan listan viimeistï¿½ alkiota */
 
   if (item==item->header->tail){
     
@@ -184,7 +183,7 @@ list* list_delete_item(list* item){
   }
 
   /*
-   * Poistetaan listan ensimmäinen alkio.
+   * Poistetaan listan ensimmï¿½inen alkio.
    */  
   if (item==item->header->head) {
     

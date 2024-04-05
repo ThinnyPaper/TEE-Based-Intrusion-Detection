@@ -1,0 +1,21 @@
+@@define MARIADB_DATA var/lib/mysql
+
+/@@{MARIADB_DATA}/mysql/innodb_(index|table)_stats\.ibd$ f VarFile
+/@@{MARIADB_DATA}/ib(data1|_logfile[01])$ f VarFile
+/@@{MARIADB_DATA}/tc\.log$ f VarFile
+/@@{MARIADB_DATA}/aria_log(\.00000001|_control)$ f VarFile
+/@@{MARIADB_DATA}$ d VarDir
+
+@@ifdef MARIADB_DBFILES_RE
+/@@{MARIADB_DATA}/@@{MARIADB_DBFILES_RE}\.ibd$ f VarFile
+@@endif
+
+/var/log/mysql$ VarDir
+/var/log/mysql/error\.log$ Log
+/var/log/mysql/error\.log\.1\.gz$ LoSerMemberLog
+/var/log/mysql/error\.log\.[23456]\.gz$ SerMemberLog
+/var/log/mysql/error\.log\.7\.gz$ HiSerMemberLog
+
+/@@{RUN}/mysqld$ d VarDirInode
+/@@{RUN}/mysqld/mysqld\.pid$ f VarFile
+!/@@{RUN}/mysqld/mysqld\.sock$ s

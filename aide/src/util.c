@@ -26,9 +26,6 @@
 #include <sys/stat.h>
 #include <ctype.h>
 #include <syslog.h>
-/*for locale support*/
-#include "locale-aide.h"
-/*for locale support*/
 
 
 #ifndef MAXHOSTNAMELEN
@@ -326,7 +323,7 @@ char* strnstr(char* haystack,char* needle,int n)
   return NULL;
 }
 #endif
-
+/*
 #ifndef HAVE_STRNLEN
 size_t strnlen(const char *s, size_t maxlen)
 {
@@ -337,7 +334,7 @@ size_t strnlen(const char *s, size_t maxlen)
 	return l;
 }
 #endif
-
+*/
 /* Lookup syslog facilities by name */
 int syslog_facility_lookup(char *s)
 {

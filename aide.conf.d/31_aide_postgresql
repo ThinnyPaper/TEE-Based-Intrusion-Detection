@@ -1,0 +1,23 @@
+!/@@{RUN}/postgresql/\\.s\\.PGSQL\\.5432$ s
+!/@@{RUN}/postgresql/\\.s\\.PGSQL\\.5432\\.lock$ f
+/@@{RUN}/postgresql/11-main\\.pg_stat_tmp$ d VarDir
+!/@@{RUN}/postgresql/11-main\\.pg_stat_tmp/(db_[[:digit:]]+|global)\\.stat$ f
+/var/lib/postgresql/11/main/base/[[:digit:]]{5,6}$ d VarDir
+!/var/lib/postgresql/11/main/base/[[:digit:]]{5,6}/[[:digit:]]{4,6}$ f
+!/var/lib/postgresql/11/main/base/[[:digit:]]{5,6}/([[:digit:]]{4,6}(_(fsm|vm))|pg_internal\\.init)$ f
+/var/lib/postgresql/11/main/(global|pg_(logical|subtrans|wal|xact))$ d VarDir
+/var/lib/postgresql/11/main/global/pg_(control|internal\\.init)$ f VarFile
+/var/lib/postgresql/11/main/global/[[:digit:]]{4}$ f VarFile
+/var/lib/postgresql/11/main/pg_logical/replorigin_checkpoint$ f VarFile
+/var/lib/postgresql/11/main/pg_multixact/offsets/0000$ f VarFile
+!/var/lib/postgresql/11/main/pg_subtrans/[[:xdigit:]]{4}$ f
+!/var/lib/postgresql/11/main/pg_wal/[[:xdigit:]]{24}$ f
+/var/lib/postgresql/11/main/pg_xact/00[0-3][[:xdigit:]]$ f VarFile
+
+/var/log/postgresql$ d VarDir
+/var/log/postgresql/postgresql-11-main\\.log$ f Log
+/var/log/postgresql/postgresql-11-main\\.log\\.1$ f LowLog
+/var/log/postgresql/postgresql-11-main\\.log\\.2\\.@@{LOGEXT}$ f LoSerMemberLog
+/var/log/postgresql/postgresql-11-main\\.log\\.[3456789]\\.@@{LOGEXT}$ f SerMemberLog
+/var/log/postgresql/postgresql-11-main\\.log\\.10\\.@@{LOGEXT}$ f HiSerMemberLog
+

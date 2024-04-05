@@ -32,21 +32,11 @@
 
 list* do_md(list* file_lst,db_config* conf);
 
-#ifdef WITH_ACL
-void acl2line(db_line* line);
-#endif
-
 #ifdef WITH_XATTR
 void xattrs2line(db_line *line);
 #endif
 
-#ifdef WITH_SELINUX
-void selinux2line(db_line *line);
-#endif
 
-#ifdef WITH_E2FSATTRS
-void e2fsattrs2line(db_line* line);
-#endif
 
 #ifdef WITH_CAPABILITIES
 void capabilities2line(db_line* line);

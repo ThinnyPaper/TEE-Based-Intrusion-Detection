@@ -1,0 +1,19 @@
+@@define SYSTEMD_UNIT_NAME [-a-z\\\\]+
+
+/@@{RUN}/user$ d VarDirInode-n
+!/@@{RUN}/user/[0-9]+(/(gnupg|systemd))?$ d
+!/@@{RUN}/user/[0-9]+/gnupg/S\\.(dirmngr|gpg-agent(\\.(browser|extra|ssh))?)$ s
+!/@@{RUN}/user/[0-9]+/gnupg/d\\.[0-9a-z]{24}$ d
+!/@@{RUN}/user/[0-9]+/(bus|systemd/(notify|private))$ s
+!/@@{RUN}/user/[0-9]+/systemd/(transient|units)$ d
+!/@@{RUN}/user/[0-9]+/systemd/inaccessible$ d
+!/@@{RUN}/user/[0-9]+/systemd/inaccessible/blk$ b
+!/@@{RUN}/user/[0-9]+/systemd/inaccessible/chr$ c
+!/@@{RUN}/user/[0-9]+/systemd/inaccessible/dir$ d
+!/@@{RUN}/user/[0-9]+/systemd/inaccessible/fifo$ p
+!/@@{RUN}/user/[0-9]+/systemd/inaccessible/reg$
+!/@@{RUN}/user/[0-9]+/systemd/inaccessible/sock$ s
+/@@{RUN}/user/[0-9]+/systemd/generator\.late(/@@{SYSTEMD_UNIT_NAME}\.wants)?$ d VarDir
+/@@{RUN}/user/[0-9]+/systemd/generator\.late/@@{SYSTEMD_UNIT_NAME}\.service$ f VarFile
+/@@{RUN}/user/[0-9]+/systemd/generator\.late/@@{SYSTEMD_UNIT_NAME}\.wants/@@{SYSTEMD_UNIT_NAME}\.service$ l VarFile
+
