@@ -405,9 +405,9 @@ static void add_file_to_tree(seltree* tree,db_line* file,int db)
              node->checked |= db==DB_NEW ? NODE_MOVED_IN : NODE_MOVED_OUT;
              moved_node->checked |= db==DB_NEW ? NODE_MOVED_OUT : NODE_MOVED_IN;
              if (changed_attr_moved_file & (ATTR(attr_ctime))) {
-                log_msg(LOG_LEVEL_DEBUG,_("  ctime is ignored, due to filename change: '%s' => '%s'"), oldData->filename, newData->filename);
+                log_msg(LOG_LEVEL_DEBUG,("  ctime is ignored, due to filename change: '%s' => '%s'"), oldData->filename, newData->filename);
              }
-             log_msg(LOG_LEVEL_DEBUG,_("  entry has been moved: '%s' => '%s'"), oldData->filename, newData->filename);
+             log_msg(LOG_LEVEL_DEBUG,("  entry has been moved: '%s' => '%s'"), oldData->filename, newData->filename);
          } else {
              log_msg(LOG_LEVEL_DEBUG,"  ignoring moved entry ('%s' => '%s') because the entries mismatch\n",
                      oldData->filename, newData->filename);
@@ -424,13 +424,13 @@ static void add_file_to_tree(seltree* tree,db_line* file,int db)
       (node->new_data!=NULL) &&
       (file->attr & ATTR(attr_allownewfile)) ){
 	 node->checked|=NODE_ALLOW_NEW;
-     log_msg(LOG_LEVEL_DEBUG,_(" mark node '%s' as NODE_ALLOW_NEW (reason: entry '%s' has ANF attribute set)"), node->path, file->filename);
+     log_msg(LOG_LEVEL_DEBUG,(" mark node '%s' as NODE_ALLOW_NEW (reason: entry '%s' has ANF attribute set)"), node->path, file->filename);
   }
   if( (db == DB_OLD) &&
       (node->old_data!=NULL) &&
       (file->attr & ATTR(attr_allowrmfile)) ){
 	  node->checked|=NODE_ALLOW_RM;
-     log_msg(LOG_LEVEL_DEBUG,_(" mark node '%s' as NODE_ALLOW_RM (reason: entry '%s' has ARF attribute set)"), node->path, file->filename);
+     log_msg(LOG_LEVEL_DEBUG,(" mark node '%s' as NODE_ALLOW_RM (reason: entry '%s' has ARF attribute set)"), node->path, file->filename);
   }
 }
 
@@ -499,13 +499,13 @@ db_line* get_file_attrs(char* filename,DB_ATTR_TYPE attr, struct stat *fs, bool 
   } else {
     
     if(fs->st_atime>cur_time){
-      log_msg(LOG_LEVEL_NOTICE,_("%s atime in future"),filename);
+      log_msg(LOG_LEVEL_NOTICE,("%s atime in future"),filename);
     }
     if(fs->st_mtime>cur_time){
-      log_msg(LOG_LEVEL_NOTICE,_("%s mtime in future"),filename);
+      log_msg(LOG_LEVEL_NOTICE,("%s mtime in future"),filename);
     }
     if(fs->st_ctime>cur_time){
-      log_msg(LOG_LEVEL_NOTICE,_("%s ctime in future"),filename);
+      log_msg(LOG_LEVEL_NOTICE,("%s ctime in future"),filename);
     }
   }
   
@@ -639,7 +639,7 @@ void populate_tree(seltree* tree, bool dry_run)
                     add_file_to_tree(tree,old,DB_OLD|DB_NEW);
                 }else{
                     if(!initdbwarningprinted){
-                        log_msg(LOG_LEVEL_WARNING, _("%s:%s: old database entry '%s' has no matching rule, run --init or --update (this warning is only shown once)"), get_url_type_string((conf->database_in.url)->type), (conf->database_in.url)->value, old->filename);
+                        log_msg(LOG_LEVEL_WARNING, ("%s:%s: old database entry '%s' has no matching rule, run --init or --update (this warning is only shown once)"), get_url_type_string((conf->database_in.url)->type), (conf->database_in.url)->value, old->filename);
                         initdbwarningprinted=1;
                     }
                     free_db_line(old);

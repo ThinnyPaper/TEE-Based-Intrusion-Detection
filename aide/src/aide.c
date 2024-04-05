@@ -63,7 +63,7 @@ char* after = NULL;
 static void usage(int exitvalue)
 {
   fprintf(stdout,
-	  _("Usage: idtt [options] command\n\n"
+	  ("Usage: idtt [options] command\n\n"
 	    "Commands:\n"
 	    "  -i, --init\t\tInitialize the database\n"
 	    "  -n, --dry-init\tTraverse the file system and match each file against rule tree\n"
@@ -247,17 +247,17 @@ static void read_param(int argc,char**argv)
 
       case 'c':{
 	  conf->config_file=optarg;
-      log_msg(LOG_LEVEL_INFO,_("(--config): set config file to '%s'"), conf->config_file);
+      log_msg(LOG_LEVEL_INFO,("(--config): set config file to '%s'"), conf->config_file);
 	break;
       }
       case 'B': {
         before = append_line_to_config(before, optarg);
-        log_msg(LOG_LEVEL_INFO,_("(--before): append '%s' to before config"), optarg);
+        log_msg(LOG_LEVEL_INFO,("(--before): append '%s' to before config"), optarg);
 	break;
       }
       case 'A': {
         after = append_line_to_config(after, optarg);
-        log_msg(LOG_LEVEL_INFO,_("(--after): append '%s' to after config"), optarg);
+        log_msg(LOG_LEVEL_INFO,("(--after): append '%s' to after config"), optarg);
 	break;
       }
       case 'l': {
@@ -268,7 +268,7 @@ static void read_param(int argc,char**argv)
                 if((conf->limit_crx=pcre_compile(conf->limit, PCRE_ANCHORED, &pcre_error, &pcre_erroffset, NULL)) == NULL) {
                     INVALID_ARGUMENT("--limit", error in regular expression '%s' at %i: %s, conf->limit, pcre_erroffset, pcre_error)
                 }
-                log_msg(LOG_LEVEL_INFO,_("(--limit): set limit to '%s'"), conf->limit);
+                log_msg(LOG_LEVEL_INFO,("(--limit): set limit to '%s'"), conf->limit);
             break;
       }
       case 'L':{
@@ -556,28 +556,28 @@ int main(int argc,char**argv)
 
   /* config合理性检测 */
   if (conf->action&(DO_DIFF|DO_COMPARE) && !(conf->database_in.url)) {
-    log_msg(LOG_LEVEL_ERROR,_("missing 'database_in', config option is required"));
+    log_msg(LOG_LEVEL_ERROR,("missing 'database_in', config option is required"));
     exit(INVALID_ARGUMENT_ERROR);
   }
   if (conf->action&DO_INIT && !(conf->database_out.url)) {
-    log_msg(LOG_LEVEL_ERROR,_("missing 'database_out', config option is required"));
+    log_msg(LOG_LEVEL_ERROR,("missing 'database_out', config option is required"));
     exit(INVALID_ARGUMENT_ERROR);
   }
   if(conf->database_in.url && conf->database_out.url && cmpurl(conf->database_in.url,conf->database_out.url)==RETOK){
       log_msg(LOG_LEVEL_NOTICE, "input and output database URLs are the same: '%s'", (conf->database_in.url)->value);
     if((conf->action&DO_INIT)&&(conf->action&DO_COMPARE)){
-      log_msg(LOG_LEVEL_ERROR,_("input and output database urls cannot be the same "
+      log_msg(LOG_LEVEL_ERROR,("input and output database urls cannot be the same "
 	    "when doing database update"));
       exit(INVALID_ARGUMENT_ERROR);
     }
     if(conf->action&DO_DIFF){
-      log_msg(LOG_LEVEL_ERROR,_("both input databases cannot be the same "
+      log_msg(LOG_LEVEL_ERROR,("both input databases cannot be the same "
 		"when doing database compare"));
       exit(INVALID_ARGUMENT_ERROR);
     }
   };
   if((conf->action&DO_DIFF)&&(!(conf->database_new.url)||!(conf->database_in.url))){
-    log_msg(LOG_LEVEL_ERROR,_("must have both input databases defined for "
+    log_msg(LOG_LEVEL_ERROR,("must have both input databases defined for "
 	      "database compare"));
     exit(INVALID_ARGUMENT_ERROR);
   }
@@ -617,7 +617,7 @@ int main(int argc,char**argv)
 	exit(IO_ERROR);
       }
       if(db_writespec(conf)==RETFAIL){
-	log_msg(LOG_LEVEL_ERROR,_("Error while writing database. Exiting.."));
+	log_msg(LOG_LEVEL_ERROR,("Error while writing database. Exiting.."));
 	exit(IO_ERROR);
       }
     }

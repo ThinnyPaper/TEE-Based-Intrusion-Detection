@@ -73,7 +73,7 @@ void* be_init(bool readonly, url_t* u, bool iszipped, bool append, int linenumbe
       }
       if (!append) {
           if(ftruncate(fd,0)==-1) {
-              log_msg(LOG_LEVEL_ERROR,_("ftruncate failed for file %s: %s"),u->value, strerror(errno));
+              log_msg(LOG_LEVEL_ERROR,("ftruncate failed for file %s: %s"),u->value, strerror(errno));
               return NULL;
           } else {
               log_msg(LOG_LEVEL_DEBUG, "successfully truncated file '%s' to size 0", u->value);
@@ -88,7 +88,7 @@ void* be_init(bool readonly, url_t* u, bool iszipped, bool append, int linenumbe
     if(iszipped && !readonly){
       gzFile gzfh = gzdopen(fd,"wb9");
       if(gzfh==NULL){
-        log_msg(LOG_LEVEL_ERROR, _("gzdopen (%s) failed for file %s"), readonly?"read-only":"read/write", u->value);
+        log_msg(LOG_LEVEL_ERROR, ("gzdopen (%s) failed for file %s"), readonly?"read-only":"read/write", u->value);
       }
     return gzfh;
     }
@@ -96,7 +96,7 @@ void* be_init(bool readonly, url_t* u, bool iszipped, bool append, int linenumbe
 #endif
       fh=fdopen(fd,readonly?"r":"w+");
       if(fh==NULL){
-          log_msg(LOG_LEVEL_ERROR, _("fdopen (%s) failed for file '%s': %s"), readonly?"read-only":"read/write", u->value, strerror(errno));
+          log_msg(LOG_LEVEL_ERROR, ("fdopen (%s) failed for file '%s': %s"), readonly?"read-only":"read/write", u->value, strerror(errno));
       }
     return fh;
 #ifdef WITH_ZLIB

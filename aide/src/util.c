@@ -277,7 +277,7 @@ char *expand_tilde(char *path) {
                 /* Don't free(homedir); because it is not safe on some platforms */
                 path = full;
             } else {
-                log_msg(LOG_LEVEL_WARNING, _("Variable name 'HOME' not found in environment. '~' cannot be expanded"));
+                log_msg(LOG_LEVEL_WARNING, ("Variable name 'HOME' not found in environment. '~' cannot be expanded"));
             }
         } else if (path[0] == '\\' && path[1] == '~') {
             path += sizeof(char);
