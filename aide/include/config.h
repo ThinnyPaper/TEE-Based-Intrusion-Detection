@@ -241,7 +241,7 @@
 
 /* syslog priority */
 #define SYSLOG_PRIORITY LOG_NOTICE
-
+#define _(Text) Text
 /* Define if LOCALE support should be used */
 /* #undef USE_LOCALE */
 

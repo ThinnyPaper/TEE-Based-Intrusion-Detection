@@ -47,11 +47,7 @@
 #endif
 
 
-#if defined(__linux__) && (defined(__i386__) || defined(__PPC__))
-#define O_NOATIME 01000000
-#else
-#define O_NOATIME 0
-#endif
+
 
 
 #ifndef __NetBSD__
