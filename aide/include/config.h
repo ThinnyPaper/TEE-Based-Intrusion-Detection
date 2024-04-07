@@ -255,7 +255,7 @@
 /* #undef WITH_AUDIT */
 
 /* use capabilities */
-#undef WITH_CAPABILITIES ???
+#undef WITH_CAPABILITIES
 
 /* Define to 1 if libcurl is available */
 /* #undef WITH_CURL */
