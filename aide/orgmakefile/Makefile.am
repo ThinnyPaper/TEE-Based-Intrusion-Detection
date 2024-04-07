@@ -55,16 +55,35 @@ aide_SOURCES = src/aide.c include/aide.h \
 	include/types.h \
 	include/url.h src/url.c\
 	include/util.h src/util.c
+if USE_CURL
+aide_SOURCES += include/fopen.h src/fopen.c
+endif
 
-aide_LDADD = -lm -lgcrypt -lgelf -lmhash -lpcre -lz -lcap -lxattr
+aide_LDADD = -lm @PCRELIB@ @CRYPTLIB@ @ACLLIB@ @SELINUXLIB@ @AUDITLIB@ @ATTRLIB@ @E2FSATTRSLIB@ @ELFLIB@ @CAPLIB@ ${CURL_LIBS}
 
-AM_CFLAGS = -D_GNU_SOURCE -W -Wall -g
+if HAVE_CHECK
+TESTS				= check_aide
+check_PROGRAMS		= check_aide
+check_aide_SOURCES	= tests/check_aide.c tests/check_aide.h \
+					  tests/check_attributes.c src/attributes.c \
+					  src/log.c src/util.c
+check_aide_CFLAGS	= -I$(top_srcdir)/include $(CHECK_CFLAGS)
+check_aide_LDADD	= -lm @PCRELIB@ @CRYPTLIB@ $(CHECK_LIBS)
+endif # HAVE_CHECK
+
+AM_CFLAGS = @AIDE_DEFS@ -W -Wall -g
 AM_CPPFLAGS = -I$(top_srcdir) \
 			  -I$(top_srcdir)/include \
 			  -I$(top_srcdir)/src \
 			  -I$(top_builddir)/src
 
 CLEANFILES = src/conf_yacc.h src/conf_yacc.c src/conf_lex.c src/db_lex.c
+
+man_MANS = doc/aide.1 doc/aide.conf.5
+
+EXTRA_DIST = $(man_MANS) Todo \
+	contrib/bzip2.sh contrib/gpg2_check.sh contrib/gpg2_update.sh \
+	contrib/gpg_check.sh contrib/gpg_update.sh contrib/sshaide.sh
 
 src/conf_yacc.c: src/conf_yacc.y
 	$(YACC) $(AM_YFLAGS) -Wno-yacc -Wall -Werror -o $@ -p conf $<
