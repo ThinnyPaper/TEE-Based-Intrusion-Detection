@@ -1,2 +1,0 @@
-/var/lib/chrony$ d VarDir
-/var/lib/chrony/chrony\\.drift$ f VarFile

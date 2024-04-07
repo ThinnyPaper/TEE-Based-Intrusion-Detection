@@ -1,2 +1,0 @@
-/var/lib/systemd/timers/stamp-cron-(daily|weekly)\\.timer$ f VarFile
-/run/systemd/use_run_parts$ f VarFile

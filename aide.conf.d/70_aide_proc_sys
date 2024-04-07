@@ -1,3 +1,0 @@
-# these rules are deliberately unrestricted
-!/proc$
-!/sys$

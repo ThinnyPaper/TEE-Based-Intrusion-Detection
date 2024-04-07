@@ -1,2 +1,0 @@
-/@@{RUN}/pcscd/pcscd\\.(pub|comm|pid)$ f VarFile
-/@@{RUN}/pcscd(/pcscd\\.events)?$ d VarDirInode

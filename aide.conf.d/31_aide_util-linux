@@ -1,3 +1,0 @@
-/@@{RUN}/(blkid|mount)$ d VarDirInode
-!/@@{RUN}/blkid/blkid\\.tab(\\.old)?$ f
-/var/lib/systemd/timers/stamp-fstrim\\.timer$ f VarFile

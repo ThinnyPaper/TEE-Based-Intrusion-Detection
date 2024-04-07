@@ -1,2 +1,0 @@
-@@define INTERFACES eth0
-/@@{RUN}/ifplugd\\.@@{INTERFACES}\\.pid$ f VarFile

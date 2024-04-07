@@ -1,2 +1,0 @@
-/@@{RUN}/lock/logcheck$ d VarDir
-/var/lib/logcheck/offset\\.[[:alnum:]\\.]+$ f VarFile

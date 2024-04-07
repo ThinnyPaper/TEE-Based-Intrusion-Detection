@@ -1,3 +1,0 @@
-/@@{RUN}/lpd\\.pid$ f VarFile
-/var/spool/lpd$ d VarDir
-/var/spool/lpd/lpd\\.lock$ f VarFile

@@ -1,2 +1,0 @@
-/@@{RUN}/sshd.pid$ f VarFile
-/@@{RUN}/sshd$ d VarFile

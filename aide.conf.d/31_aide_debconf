@@ -1,2 +1,0 @@
-/var/cache/debconf/(config|templates)\\.dat(-old)?$ f VarFile
-/var/cache/debconf$ d VarDir

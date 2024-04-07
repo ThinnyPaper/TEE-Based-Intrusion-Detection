@@ -1,3 +1,0 @@
-/var/lib/redis$ d VarDir
-/var/lib/redis/dump\\.rdb$ f VarFile
-/var/log/redis/redis-server\\.log$ f VarFile

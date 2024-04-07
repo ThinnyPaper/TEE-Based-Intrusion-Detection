@@ -1,2 +1,0 @@
-/@@{RUN}/vsftpd(/empty)?$ d VarDirInode
-/@@{RUN}/vsftpd/vsftpd\\.pid$ f VarFile

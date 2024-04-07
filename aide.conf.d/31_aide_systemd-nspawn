@@ -1,2 +1,0 @@
-!/run/systemd/nspawn(/(locks|propagate))?$ d
-

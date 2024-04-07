@@ -1,2 +1,0 @@
-/@@{RUN}/systemd/resolve$ d VarDir
-/@@{RUN}/systemd/resolve/resolv\\.conf$ f VarFile

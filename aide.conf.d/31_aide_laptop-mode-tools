@@ -1,3 +1,0 @@
-/@@{RUN}/laptop-mode-tools/(state(-brightness-command)?|enabled|start-stop-undo-actions|nolm-mountopts)$ f VarFile
-/@@{RUN}/laptop-mode-tools$ d VarDirInode
-/@@{RUNLOCK}/lmt-(req|invoc)\\.lock$ f VarInode

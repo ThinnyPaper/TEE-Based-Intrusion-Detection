@@ -1,4 +1,0 @@
-/var/log/rsnapshot\\.log$ f Log
-/var/log/rsnapshot\\.log\\.1\\.@@{LOGEXT}$ f LoSerMemberLog
-/var/log/rsnapshot\\.log\\.[2-5]\\.@@{LOGEXT}$ f SerMemberLog
-/var/log/rsnapshot\\.log\\.6\\.@@{LOGEXT}$ f HiSerMemberLog

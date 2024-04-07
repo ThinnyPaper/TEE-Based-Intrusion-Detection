@@ -1,1 +1,0 @@
-!/@@{RUN}/user/[0-9]+/gnupg(/S.(dirmngr|gpg-agent(\\.(browser|extra|ssh))?|scdaemon))?$ s

@@ -1,3 +1,0 @@
-/@@{RUN}/systemd/resolve/stub-resolv\\.conf$ f VarFile
-!/@@{RUN}/systemd/resolve/io\\.systemd\\.Resolve$ s
-
