@@ -581,6 +581,7 @@ int main(int argc,char**argv)
 	      "database compare"));
     exit(INVALID_ARGUMENT_ERROR);
   }
+  /* config合理性检测 */
 
   if (conf->action&DO_INIT && conf->action&DO_DRY_RUN) {
       if(db_disk_init()==RETFAIL) {
@@ -591,21 +592,21 @@ int main(int argc,char**argv)
       exit (0);
   }
 
-  if (!(conf->action&DO_DRY_RUN)) {
+  if (!(conf->action&DO_DRY_RUN)) { //没有DO_DRY_RUN标志的话
 
-  if (!init_report_urls()) {
-      exit(INVALID_CONFIGURELINE_ERROR);
-  }
-  //试试prefix前缀能不能打开
-  if (conf->action&(DO_INIT|DO_COMPARE) && conf->root_prefix_length > 0) {
-      DIR *dir;
-      if((dir = opendir(conf->root_prefix)) != NULL) {
-          closedir(dir);
-      } else {
-          log_msg(LOG_LEVEL_ERROR,"opendir() for root_prefix %s failed: %s", conf->root_prefix, strerror(errno));
-          exit(INVALID_CONFIGURELINE_ERROR);
-      }
-  }
+    if (!init_report_urls()) {
+        exit(INVALID_CONFIGURELINE_ERROR);
+    }
+    //试试prefix前缀能不能打开
+    if (conf->action&(DO_INIT|DO_COMPARE) && conf->root_prefix_length > 0) {
+        DIR *dir;
+        if((dir = opendir(conf->root_prefix)) != NULL) {
+            closedir(dir);
+        } else {
+            log_msg(LOG_LEVEL_ERROR,"opendir() for root_prefix %s failed: %s", conf->root_prefix, strerror(errno));
+            exit(INVALID_CONFIGURELINE_ERROR);
+        }
+    }
     if(conf->action&DO_INIT){
       if(db_init(&(conf->database_out), false,
 #ifdef WITH_ZLIB

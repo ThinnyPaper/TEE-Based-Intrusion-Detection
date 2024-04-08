@@ -605,19 +605,19 @@ void populate_tree(seltree* tree, bool dry_run)
     initdbwarningprinted=1;
   }
   
-    if(conf->action&DO_DIFF){
-        log_msg(LOG_LEVEL_INFO, "read new entries from database: %s:%s", get_url_type_string((conf->database_new.url)->type), (conf->database_new.url)->value);
-      db_lex_buffer(&(conf->database_new));
-      while((new=db_readline(&(conf->database_new))) != NULL){
-	if((add=check_rxtree(new->filename,tree, &rule, get_restriction_from_perm(new->perm), dry_run))>0){
-	  add_file_to_tree(tree,new,DB_NEW);
-	} else {
-          free_db_line(new);
-          free(new);
-          new=NULL;
-	}
+  if(conf->action&DO_DIFF){
+    log_msg(LOG_LEVEL_INFO, "read new entries from database: %s:%s", get_url_type_string((conf->database_new.url)->type), (conf->database_new.url)->value);
+    db_lex_buffer(&(conf->database_new));
+    while((new=db_readline(&(conf->database_new))) != NULL){
+      if((add=check_rxtree(new->filename,tree, &rule, get_restriction_from_perm(new->perm), dry_run))>0){
+        add_file_to_tree(tree,new,DB_NEW);
+      } else {
+              free_db_line(new);
+              free(new);
+              new=NULL;
       }
-      db_lex_delete_buffer(&(conf->database_new));
+    }
+    db_lex_delete_buffer(&(conf->database_new));
     }
     
     if((conf->action&DO_INIT)||(conf->action&DO_COMPARE)){

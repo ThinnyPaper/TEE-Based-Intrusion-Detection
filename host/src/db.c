@@ -82,8 +82,6 @@ static struct md_container *init_db_attrs(url_t *u) {
             case url_stderr:
             case url_fd:
             case url_file:
-            case url_http:
-            case url_https:
             case url_ftp: {
                 mdc = checked_malloc(sizeof(struct md_container)); /* freed in close_db_attrs */
                 mdc->todo_attr = conf->db_attrs;
