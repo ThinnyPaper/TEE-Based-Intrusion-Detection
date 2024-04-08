@@ -24,6 +24,7 @@
  */
 
 #include "aide.h"
+#include <tee_client_api.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -641,6 +642,7 @@ int main(int argc,char**argv)
     if(conf->action&DO_INIT) {
         log_msg(LOG_LEVEL_INFO, "write new entries to database: %s:%s", get_url_type_string((conf->database_out.url)->type), (conf->database_out.url)->value);
         write_tree(conf->tree);
+        
     }
 
     db_close();
