@@ -4,6 +4,14 @@
 #include <tee_internal_api.h>
 #include <tee_internal_api_extensions.h>
 
+// load_db
+//#include <uthash.h>
+
+//command cmp
+// 老树-getnode 
+
+
+
 /*
  * Called when the instance of the TA is created. This is the first call in
  * the TA.

@@ -1,25 +1,3 @@
-/*
- * AIDE (Advanced Intrusion Detection Environment)
- *
- * Copyright (C) 1999-2002, 2004-2006, 2010-2013, 2015-2016, 2019-2021
- *               Rami Lehti, Pablo Virolainen, Richard van den Berg,
- *               Hannes von Haugwitz
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
- 
 #ifndef _DB_CONFIG_H_INCLUDED
 #define _DB_CONFIG_H_INCLUDED
 #include "config.h"
@@ -64,17 +42,13 @@ typedef struct xattrs_type
 #include <mhash.h>
 #endif
 
-#ifdef WITH_ZLIB
-#include <zlib.h>
-#endif
 
 #define RETOK 0
 #define RETFAIL -1
 
-#define DO_INIT     (1<<0)
-#define DO_COMPARE  (1<<1)
-#define DO_DIFF     (1<<2)
-#define DO_DRY_RUN  (1<<3)
+#define DO_INIT      (1<<0)
+#define DO_CHECKALL  (1<<1)
+#define DO_CHECK     (1<<2)
 
 #include "url.h"
 
@@ -84,25 +58,6 @@ typedef struct xattrs_type
  */
 
 #define TIMEBUFSIZE (((sizeof(time_t)*5+1)>>1)+1)
-
-
-/*
-  New db_config
-  Not used yet, maybe someday.
-*/
-
-/*  typedef struct _db_config { */
-/*    url_t* url; */
-/*    config* conf; */
-/*    int inout; */
-/*    int (*init)(url*,int,config*); */
-/*    char** (*readline)(_db_config*); */
-/*    int (*writeline)(_db_config*,db_line* line); */
-/*    int (*close)(_db_config*); */
-/*    int db_size; */
-/*    DB_FIELD* db_order; */
-/*    void* local; */  
-/*  }_db_config ; */
 
 
 #include "seltree.h"
@@ -150,9 +105,6 @@ typedef struct database {
     char *linebuf;
 
     void *fp;
-#ifdef WITH_ZLIB
-    gzFile gzp;
-#endif
 
     long lineno;
     ATTRIBUTE* fields;
@@ -166,25 +118,12 @@ typedef struct database {
 typedef struct db_config {
   char *hostname;
 
-  database database_in;
-  database database_out;
-  database database_new;
-
-  DB_ATTR_TYPE db_attrs;
-
-#ifdef WITH_ZLIB
-  /* Is dbout gzipped or not */
-  int gzip_dbout;
-  
-#endif
-
   DB_ATTR_TYPE db_out_attrs;
 
   char *check_path;
   RESTRICTION_TYPE check_file_type;
   
   char* config_file;
-  char* config_version;
 
   int database_add_metadata;
   int report_detailed_init;

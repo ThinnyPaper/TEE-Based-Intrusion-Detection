@@ -126,43 +126,24 @@ url_t* parse_url(char* val, int linenumber, char* filename, char* linebuf)
   return u;
 }
 
-int parse_config(char *before, char *config, char* after) {
-    if(before==NULL && after==NULL && (config==NULL||strcmp(config,"")==0)){
-      log_msg(LOG_LEVEL_ERROR,("missing configuration (use '--config' '--before' or '--after' command line parameter)"));
+//change
+int parse_config(char *config) {
+    if(config==NULL||strcmp(config,"")==0){
+      log_msg(LOG_LEVEL_ERROR,("missing configuration (use '--config' command line parameter)"));
       return RETFAIL;
     }
 
     ast* config_ast = NULL;
-    if (before) {
-        conf_lex_string("(--before)", before);
-        if(confparse(&config_ast)){
-          return RETFAIL;
-        }
-        conf_lex_delete_buffer();
-        eval_config(config_ast, 0);
-        deep_free(config_ast);
-        config_ast = NULL;
+
+    conf_lex_file(config);
+    if(confparse(&config_ast)){
+      return RETFAIL;
     }
-    if (config) {
-        conf_lex_file(config);
-        if(confparse(&config_ast)){
-          return RETFAIL;
-        }
-        conf_lex_delete_buffer();
-        eval_config(config_ast, 0);
-        deep_free(config_ast);
-        config_ast = NULL;
-    }
-    if (after) {
-        conf_lex_string("(--after)", after);
-        if(confparse(&config_ast)){
-          return RETFAIL;
-        }
-        conf_lex_delete_buffer();
-        eval_config(config_ast, 0);
-        deep_free(config_ast);
-        config_ast = NULL;
-    }
+    conf_lex_delete_buffer();
+    eval_config(config_ast, 0);
+    deep_free(config_ast);
+    config_ast = NULL;
+    
   return RETOK;
 }
 

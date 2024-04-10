@@ -28,7 +28,7 @@
 #include "db_config.h"
 #include "db.h"
 
-int parse_config(char *, char *, char *);
+int parse_config(char *);
 
 int conf_input_wrapper(char* buf, int max_size, FILE* in);
 int db_input_wrapper(char*, int, database*);
