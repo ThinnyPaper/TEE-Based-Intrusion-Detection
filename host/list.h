@@ -1,30 +1,9 @@
-/*
- * AIDE (Advanced Intrusion Detection Environment)
- *
- * Copyright (C) 1999-2002, 2010 Rami Lehti, Pablo Virolainen,
- *               Hannes von Haugwitz
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
-
 #ifndef _LIST_H_INCLUDED
 #define _LIST_H_INCLUDED
 
-typedef struct list {
-  struct list* next;
-  struct list* prev;
+typedef struct node {
+  struct node* next;
+  struct node* prev;
 
   struct list_header* header;
 
@@ -34,27 +13,23 @@ typedef struct list {
   */
 
   void* data;
-} list;
+} node;
 
 typedef struct list_header{
   
-  struct list* head;
-  struct list* tail;
+  struct node* head;
+  struct node* tail;
   
 }list_header;
 
-list* list_sorted_insert(list* listp, void* data, int (*compare) (const void*, const void*));
+//list* list_sorted_insert(list* listp, void* data, int (*compare) (const void*, const void*));
 
-list* list_append(list* listp,void*data);
+node* list_append(node* listp,void*data);
 
-/*
 
-list* new_list_item(void*);
 
-*/
+node* list_delete_item(node* item);
 
-list* list_delete_item(list* item);
-
-#endif /* _DB_LIST_H_INCLUDED */
+#endif 
 
 

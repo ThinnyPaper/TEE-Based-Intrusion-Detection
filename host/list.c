@@ -1,24 +1,3 @@
-/*
- * AIDE (Advanced Intrusion Detection Environment)
- *
- * Copyright (C) 1999-2002, 2005-2006, 2010, 2019-2020 Rami Lehti,
- *               Pablo Virolainen, Richard van den Berg, Hannes von Haugwitz
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
-
 #include <stdlib.h>
 #include "list.h"
 #include "log.h"
@@ -36,60 +15,6 @@
  */
 
 
-/* list_sorted_insert()
- * Adds an item in a sorted list:
- *   - The first argument is the head of the list
- *   - The second argument is the data to be added
- *   - The third argument is the function pointer to the compare function to use
- *   - Returns the head of the list
- */
-list* list_sorted_insert(list* listp, void* data, int (*compare) (const void*, const void*)) {
-    list* newitem=NULL;
-    list* curitem=NULL;
-    newitem = checked_malloc(sizeof(list));
-    if (listp==NULL){
-        list_header* header = checked_malloc(sizeof(list_header));
-        newitem->data=data;
-        newitem->header=header;
-        newitem->next=NULL;
-        newitem->prev=NULL;
-        header->head=newitem;
-        header->tail=newitem;
-        return newitem;
-    } else {
-        /* add element in sorted, non-empty list (use insertion sort) */
-        curitem = listp->header->head;
-        newitem->header=listp->header;
-        newitem->data=data;
-        if (compare(newitem->data,curitem->data) <= 0) {
-            /* new element is the new head */
-            listp->header->head=newitem;
-            curitem->prev=newitem;
-            newitem->next=curitem;
-            newitem->prev=NULL;
-            return newitem;
-        } else {
-            /* find position for new element */
-            while(compare(newitem->data, curitem->data) > 0 && curitem->next != NULL) {
-               curitem=curitem->next;
-            }
-            if (curitem->next == NULL && compare(newitem->data, curitem->data) > 0) {
-                /* new element is the new tail */
-                listp->header->tail=newitem;
-                curitem->next=newitem;
-                newitem->prev=curitem;
-                newitem->next=NULL;
-            } else {
-                /* new element is an inner element */
-                curitem->prev->next=newitem;
-                newitem->prev=curitem->prev;
-                curitem->prev=newitem;
-                newitem->next=curitem;
-            }
-        }
-        return listp;
-    }
-}
 
 /* list_append()
  * append an item to list
@@ -104,10 +29,10 @@ list* list_sorted_insert(list* listp, void* data, int (*compare) (const void*, c
  * Some way to handle mallocs failure would be nice.
  */
 
-list* list_append(list* listp,void*data)
+node* list_append(node* listp,void*data)
 {
-  list* newitem=NULL;
-  newitem = checked_malloc(sizeof(list));
+  node* newitem=NULL;
+  newitem = checked_malloc(sizeof(node));
   
   if(listp==NULL){
     list_header* header = checked_malloc(sizeof(list_header));
@@ -146,8 +71,8 @@ list* list_append(list* listp,void*data)
  * returns head of a list.
  */
 
-list* list_delete_item(list* item){
-  list* r;
+node* list_delete_item(node* item){
+  node* r;
 
 
   if (item==NULL) {
@@ -183,7 +108,6 @@ list* list_delete_item(list* item){
   }
 
   /*
-   * Poistetaan listan ensimm�inen alkio.
    */  
   if (item==item->header->head) {
     

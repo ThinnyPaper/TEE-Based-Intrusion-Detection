@@ -24,12 +24,18 @@
  */
 
 #include "idtt.h"
-#include <tee_client_api.h>
+//#include <tee_client_api.h>
 #include <unistd.h>
 #include <getopt.h> 
 
 #include "log.h"
+#include "db.h"
+#include "readconf.h"
+#include "util.h"
 
+#ifndef MAXHOSTNAMELEN
+#define MAXHOSTNAMELEN 256
+#endif
 db_config* conf;
 
 static void usage(int exitvalue){
@@ -47,7 +53,7 @@ static void usage(int exitvalue){
 }
 
 static void read_param(int argc,char**argv){
-    int option = -1;
+    int op = -1;
     int i=0;
 
     static struct option options[] =
@@ -58,38 +64,36 @@ static void read_param(int argc,char**argv){
     { "check", required_argument, NULL, 'c'},
     { NULL,0,NULL,0 }
     };
-
-    while(option=getopt_long(argc, argv, "hiac:", options, &i)!=-1){
-        switch(option){
-            case: 'h':{
+    op=getopt_long(argc, argv, "hiac:", options, &i);
+    while(op!=-1){
+        op=getopt_long(argc, argv, "hiac:", options, &i);
+        switch(op){
+            case 'h':{
                 usage(0);
                 break;
             }
-            case: 'i':{
+            case 'i':{
                 if(conf->action==0){ 
                     conf->action=DO_INIT; 
                     log_msg(LOG_LEVEL_INFO,"command: init database"); 
                 } else { 
-                    INVALID_ARGUMENT(longopt, %s, "cannot have multiple commands on a single commandline") 
-                    exit(INVALID_ARGUMENT_ERROR); 
+                    exit(-1); 
                 } 
             }
-            case: 'a':{
+            case 'a':{
                 if(conf->action==0){ 
                     conf->action=DO_CHECKALL; 
                     log_msg(LOG_LEVEL_INFO,"command: check all files"); 
                 } else { 
-                    INVALID_ARGUMENT(longopt, %s, "cannot have multiple commands on a single commandline") 
-                    exit(INVALID_ARGUMENT_ERROR); 
+                    exit(-1); 
                 } 
             }
-            case: 'c':{
+            case 'c':{
                 if(conf->action==0){ 
                     conf->action=DO_CHECK; 
                     log_msg(LOG_LEVEL_INFO,"command: check file %s", optarg); 
                 } else { 
-                    INVALID_ARGUMENT(longopt, %s, "cannot have multiple commands on a single commandline") 
-                    exit(INVALID_ARGUMENT_ERROR); 
+                    exit(-1); 
                 } 
             }
         }
@@ -99,13 +103,14 @@ static void read_param(int argc,char**argv){
 
 static void setdefaults_before_config(){
     //set db_config defalt;
+    conf->filelist=NULL;
     conf->config_file=
 #ifdef CONFIG_FILE
         CONFIG_FILE
 #else
         NULL
 #endif
-
+;
 
 }
 
@@ -118,65 +123,31 @@ int main(int argc,char**argv){
     read_param(argc, argv);
 
     setdefaults_before_config();
-
     //读config文件
     log_msg(LOG_LEVEL_INFO, "read configure file: %s", conf->config_file);
-    errorno=parse_config(conf->config_file);
-    if (errorno==RETFAIL){
-        exit(INVALID_CONFIGURELINE_ERROR);
+    readconf(conf->config_file, conf);
+
+
+    //get hostname 
+    conf->hostname = checked_malloc(sizeof(char) * MAXHOSTNAMELEN + 1);
+    if (gethostname(conf->hostname,MAXHOSTNAMELEN) == -1) {
+        log_msg(LOG_LEVEL_WARNING,"gethostname failed: %s", strerror(errorno));
+        free(conf->hostname);
+        conf->hostname = NULL;
+    } else {
+        log_msg(LOG_LEVEL_DEBUG, "hostname: '%s'", conf->hostname);
+    }
+    
+    node* it=conf->filelist;
+    while(it!=NULL){
+
+        printf("%s\n", it->data);
+        it=it->next;
     }
 
-    readconfig
 
 
-  log_msg(LOG_LEVEL_INFO, "read command line parameters");
-  read_param(argc,argv);
-
-  /* get hostname */
-  conf->hostname = checked_malloc(sizeof(char) * MAXHOSTNAMELEN + 1);
-  if (gethostname(conf->hostname,MAXHOSTNAMELEN) == -1) {
-      log_msg(LOG_LEVEL_WARNING,"gethostname failed: %s", strerror(errno));
-      free(conf->hostname);
-      conf->hostname = NULL;
-  } else {
-      log_msg(LOG_LEVEL_DEBUG, "hostname: '%s'", conf->hostname);
-  }
-
-
-
-
-  log_msg(LOG_LEVEL_CONFIG, "report_urls:");
-  log_report_urls(LOG_LEVEL_CONFIG); //what？
-
-  log_msg(LOG_LEVEL_RULE, "rule tree:");
-  log_tree(LOG_LEVEL_RULE, conf->tree, 0);
-
-    //我们要不要检查模型路径可访问性？
-    /*
-  if (conf->check_path) {
-      rx_rule* rule = NULL;
-      int match = check_rxtree(conf->check_path, conf->tree, &rule, conf->check_file_type, true);
-      if (match < 0) {
-        fprintf(stdout, "[ ] %c '%s': outside of limit '%s'\n", get_restriction_char(conf->check_file_type), conf->check_path, conf->limit);
-        exit(2);
-      } else {
-        exit(match?0:1);
-      }
-  }
-  */
-
-
-// tp
-
-
-
-// init
-
-// check -a
-// 逐个检查config中的文件
-
-// check -f file 
-// 发一个node过去 
+/*
 
 
     if (!init_report_urls()) {
@@ -240,5 +211,6 @@ int main(int argc,char**argv){
     exit(exitcode);
   
   return RETOK;
+  */
 }
 // vi: ts=8 sw=8

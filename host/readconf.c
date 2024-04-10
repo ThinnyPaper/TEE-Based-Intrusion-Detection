@@ -1,90 +1,65 @@
-
 #include "readconf.h"
 
+#include <libconfig.h>
 #include <string.h>
-#include <pcre.h>
-#include "idtt.h"
+#include <stdlib.h>
+#include <glob.h>
 #include "log.h"
-#include "conf_lex.h"
-
-#include "conf_yacc.h"
-
 #include "db.h"
-static char* getconfig(char* name)
-{
+#include "util.h"
 
-	static char info[64];
-	int find=0;
-	char tmp[256],fore[64],back[64],tmpcwd[MAXLINE];
-	char *fs,*fe,*equal,*bs,*be,*start;
 
-	strcpy(tmpcwd,cwd);
-	strcat(tmpcwd,"/");
-	FILE *fp=getfp(strcat(tmpcwd,"config.ini"));
-	while(fgets(tmp,255,fp)!=NULL)
-	{
-		start=tmp;
-		equal=strchr(tmp,'=');
+static node* deal_regex_path(const char* path, node* pathlist){
+  //TODO：获取绝对路径
 
-		while(isblank(*start))
-			++start;
-		fs=start;
+  
+  glob_t* glob_result=checked_malloc(sizeof(glob_result));
 
-		if(*fs=='#')
-			continue;
-		while(isalpha(*start))
-			++start;
-		fe=start-1;
-
-		strncpy(fore,fs,fe-fs+1);
-		fore[fe-fs+1]='\0';
-		if(strcmp(fore,name)!=0)
-			continue;
-		find=1;
-
-		start=equal+1;
-		while(isblank(*start))
-			++start;
-		bs=start;
-
-		while(!isblank(*start)&&*start!='\n')
-			++start;
-		be=start-1;
-
-		strncpy(back,bs,be-bs+1);
-		back[be-bs+1]='\0';
-		strcpy(info,back);
-		break;
-	}
-	if(find)
-		return info;
-	else
-		return NULL;
+    int rt = glob(path, 0, NULL, glob_result);
+    if (rt == 0) {
+        printf("Found %zu matching file(s):\n", glob_result->gl_pathc);
+        for (size_t i = 0; i < glob_result->gl_pathc; ++i) {
+            //char* fullpath="asd";//glob_result->gl_pathv[i];
+            pathlist=list_append(pathlist,glob_result->gl_pathv[i]);
+            printf("Found match file: %s\n", glob_result->gl_pathv[i]);
+            log_msg(LOG_LEVEL_INFO, "Found match file: %s", glob_result->gl_pathv[i]);
+        }
+    } else {
+        printf("No match file found using %s\n", path);
+        log_msg(LOG_LEVEL_INFO, "No match file found using %s", path);
+    }
+    free(glob_result);
+  return pathlist;
 }
 
+void readconf(char* configfile, db_config* conf){
+  //读文件列表
+  config_t cfg;
+  config_setting_t *setting;
+  const char *file_path;
 
-int read_file_list(char *config){
-    //use lex to get a file path
-    //new lsit
-    filelist.tail->
-}
+  config_init(&cfg);
 
-int parse_config(char *config) {
-    if(config==NULL||strcmp(config,"")==0){
-      log_msg(LOG_LEVEL_ERROR,("missing configuration file"));
-      return RETFAIL;
-    }
+  if (!config_read_file(&cfg, configfile))
+  {
+      log_msg(LOG_LEVEL_ERROR,"read conig file error: %s\n", config_error_file(&cfg));
+      config_destroy(&cfg);
+      exit(1);
+  }
 
-    ast* config_ast = NULL;
+  // 读取 file_path 数组
+  setting = config_lookup(&cfg, "file_path");
+  if (setting != NULL)
+  {
+      int length = config_setting_length(setting);
+      for(int i = 0; i < length; ++i)
+      {
+          file_path = config_setting_get_string_elem(setting, i);
+          conf->filelist=deal_regex_path(file_path, conf->filelist);
+      }
+  }
 
-    conf_lex_file(config);
-    if(confparse(&config_ast)){
-      return RETFAIL;
-    }
-    conf_lex_delete_buffer();
-    eval_config(config_ast, 0);
-    deep_free(config_ast);
-    config_ast = NULL;
-    
-  return RETOK;
+
+  config_destroy(&cfg);
+
 }

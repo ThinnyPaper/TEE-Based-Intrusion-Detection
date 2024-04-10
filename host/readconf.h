@@ -1,10 +1,9 @@
 #ifndef _READCONF_H_INCLUDED
 #define _READCONF_H_INCLUDED
 
-#include "list.h"
+#include "db.h"
 
-list_header filelist;
+void readconf(char*, db_config* );
 
-int parse_config(char*) ;
 
 #endif

@@ -24,7 +24,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <sys/types.h>
-#include "url.h"
+
 
 #define HEXD2ASC(x) (((x) < 10) ? ((x) + '0') : ((x) - 10 + 'A'))
 
@@ -47,7 +47,6 @@ void* checked_strdup(const char *);
 void* checked_strndup(const char *, size_t);
 void* checked_realloc(void *, size_t);
 
-int cmpurl(url_t*, url_t*);
 
 int contains_unsafe(const char*);
 
