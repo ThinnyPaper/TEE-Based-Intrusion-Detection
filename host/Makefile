@@ -1,7 +1,7 @@
 CC = gcc
 OFLAGS = -D_GNU_SOURCE -W -Wall -g -O2
 CFLAGS = $(OFLAGS) -I./
-LDFLAGS = $(OFLAGS) -static -lm -lgcrypt -lpcre -lz -lgpg-error -lconfig# -lgelf -lmhash -lcap -lxattr
+LDFLAGS = $(OFLAGS) -static -lm -lgcrypt -lpcre -lz -lgpg-error -lconfig -lmhash# -lgelf  -lcap -lxattr
 FLEX = flex
 YACC = bison -d
 

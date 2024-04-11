@@ -27,6 +27,7 @@
 //#include <tee_client_api.h>
 #include <unistd.h>
 #include <getopt.h> 
+#include <limits.h>
 
 #include "log.h"
 #include "db.h"
@@ -37,6 +38,7 @@
 #define MAXHOSTNAMELEN 256
 #endif
 db_config* conf;
+char* filename;
 
 static void usage(int exitvalue){
   fprintf(stdout,
@@ -64,9 +66,8 @@ static void read_param(int argc,char**argv){
     { "check", required_argument, NULL, 'c'},
     { NULL,0,NULL,0 }
     };
-    op=getopt_long(argc, argv, "hiac:", options, &i);
-    while(op!=-1){
-        op=getopt_long(argc, argv, "hiac:", options, &i);
+    
+    while((op=getopt_long(argc, argv, "hiac:", options, &i))!=-1){
         switch(op){
             case 'h':{
                 usage(0);
@@ -76,6 +77,7 @@ static void read_param(int argc,char**argv){
                 if(conf->action==0){ 
                     conf->action=DO_INIT; 
                     log_msg(LOG_LEVEL_INFO,"command: init database"); 
+                    break;
                 } else { 
                     exit(-1); 
                 } 
@@ -84,6 +86,7 @@ static void read_param(int argc,char**argv){
                 if(conf->action==0){ 
                     conf->action=DO_CHECKALL; 
                     log_msg(LOG_LEVEL_INFO,"command: check all files"); 
+                    break;
                 } else { 
                     exit(-1); 
                 } 
@@ -91,7 +94,10 @@ static void read_param(int argc,char**argv){
             case 'c':{
                 if(conf->action==0){ 
                     conf->action=DO_CHECK; 
+                    filename=checked_malloc(sizeof(optarg));
+                    strncpy(filename,optarg,sizeof(optarg)-1);
                     log_msg(LOG_LEVEL_INFO,"command: check file %s", optarg); 
+                    break;
                 } else { 
                     exit(-1); 
                 } 
@@ -119,14 +125,9 @@ int main(int argc,char**argv){
     umask(0177); //仅本用户可读写
 
     conf=(db_config*)checked_malloc(sizeof(db_config));
-    
     read_param(argc, argv);
 
     setdefaults_before_config();
-    //读config文件
-    log_msg(LOG_LEVEL_INFO, "read configure file: %s", conf->config_file);
-    readconf(conf->config_file, conf);
-
 
     //get hostname 
     conf->hostname = checked_malloc(sizeof(char) * MAXHOSTNAMELEN + 1);
@@ -137,13 +138,67 @@ int main(int argc,char**argv){
     } else {
         log_msg(LOG_LEVEL_DEBUG, "hostname: '%s'", conf->hostname);
     }
-    
+
+    //读config文件
+    log_msg(LOG_LEVEL_INFO, "read configure file: %s", conf->config_file);
+    readconf(conf->config_file, conf);
     node* it=conf->filelist;
     while(it!=NULL){
 
         printf("%s\n", it->data);
         it=it->next;
     }
+
+    if(conf->action==DO_INIT){
+        node* it=conf->filelist;
+        while(it!=NULL){
+            gen_file_to_db_line(it->data);
+           // line->
+            //to TEE
+
+            it=it->next;
+        }
+    }else if(conf->action==DO_CHECK){
+        if(filename==NULL){
+            printf("No file path arg\n");
+            exit(1);
+        }else{
+            //full path filename
+            char* fullfilepath=checked_malloc(PATH_MAX);
+
+            realpath(filename, fullfilepath);
+            free(filename);
+            filename=fullfilepath;
+            //printf("fullpath: %s\n",fullfilepath);
+            //gen filename to db_line;
+            gen_file_to_db_line(filename);
+            //to TEE
+        }
+    }else if(conf->action==DO_CHECKALL){
+        node* it=conf->filelist;
+        while(it!=NULL){
+            //gen it to db_line;
+               
+
+            db_line* line=gen_file_to_db_line(it->data);
+            printf("SHA-256 Hash: ");
+
+            for (int i = 0; i < 32; i++) {
+                printf("%02x", line->hash_sha256[i]);
+            }
+            printf("\n");
+            //to TEE
+
+
+            it=it->next;
+        }
+    }else{
+        printf("NO ACTION\n");
+        exit(1);
+    }
+
+
+
 
 
 

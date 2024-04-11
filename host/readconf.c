@@ -5,17 +5,16 @@
 #include <stdlib.h>
 #include <glob.h>
 #include "log.h"
-#include "db.h"
 #include "util.h"
 
 
 static node* deal_regex_path(const char* path, node* pathlist){
-  //TODO：获取绝对路径
+  //TODO：处理～/路径
 
   
   glob_t* glob_result=checked_malloc(sizeof(glob_result));
 
-    int rt = glob(path, 0, NULL, glob_result);
+    int rt = glob(path, GLOB_ERR, NULL, glob_result);
     if (rt == 0) {
         printf("Found %zu matching file(s):\n", glob_result->gl_pathc);
         for (size_t i = 0; i < glob_result->gl_pathc; ++i) {
@@ -24,8 +23,11 @@ static node* deal_regex_path(const char* path, node* pathlist){
             printf("Found match file: %s\n", glob_result->gl_pathv[i]);
             log_msg(LOG_LEVEL_INFO, "Found match file: %s", glob_result->gl_pathv[i]);
         }
-    } else {
-        printf("No match file found using %s\n", path);
+    } else if(rt==GLOB_ABORTED){
+        printf("Can not open path: %s\n", path);
+        log_msg(LOG_LEVEL_INFO, "Can not open path: %s\n", path);
+    } else{
+        printf("No match file found using %s%d\n", path,GLOB_ABORTED);
         log_msg(LOG_LEVEL_INFO, "No match file found using %s", path);
     }
     free(glob_result);
