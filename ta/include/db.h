@@ -1,13 +1,6 @@
 #ifndef _DB_H_INCLUDED
 #define _DB_H_INCLUDED
 
-#define RETOK 0
-#define RETFAIL -1
-
-#define DO_INIT     (1<<0)
-#define DO_CHECKALL (1<<1)
-#define DO_CHECK     (1<<2)
-
 #include <unistd.h>
 #include <stdio.h>
 #include <sys/types.h>
@@ -59,6 +52,7 @@ typedef struct db_line {
 
 
 } db_line;
+
 
 typedef struct database {
 

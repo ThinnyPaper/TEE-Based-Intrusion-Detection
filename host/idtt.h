@@ -5,8 +5,15 @@
 #include <stdlib.h>
 #include <list.h>
 
+#define RETOK 0
+#define RETFAIL -1
 
-typedef struct db_config {
+#define NO_ACTION 0
+#define DO_INIT (1<<0)
+#define DO_CHECKALL (1<<1)
+#define DO_CHECK (1<<2)
+
+typedef struct idtt_config {
   char *hostname;
 
   node* filelist;
@@ -16,7 +23,7 @@ typedef struct db_config {
   /* What are we supposed to do */
   int action;
 
-} db_config;
+} idtt_config;
 
 
 #endif

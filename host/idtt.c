@@ -38,7 +38,7 @@
 #ifndef MAXHOSTNAMELEN
 #define MAXHOSTNAMELEN 256
 #endif
-db_config* conf;
+idtt_config* conf;
 char* filename;
 
 static void usage(int exitvalue){
@@ -108,8 +108,9 @@ static void read_param(int argc,char**argv){
 
 }
 
-static void setdefaults_before_config(){
+static void setdefaults_idtt_config(){
     //set db_config defalt;
+    conf->hostname=NULL;
     conf->filelist=NULL;
     conf->config_file=
 #ifdef CONFIG_FILE
@@ -118,6 +119,7 @@ static void setdefaults_before_config(){
         NULL
 #endif
 ;
+    conf->action=NO_ACTION;
 
 }
 
@@ -128,7 +130,7 @@ int main(int argc,char**argv){
     conf=(db_config*)checked_malloc(sizeof(db_config));
     read_param(argc, argv);
 
-    setdefaults_before_config();
+    setdefaults_idtt_config();
 
     //get hostname 
     conf->hostname = checked_malloc(sizeof(char) * MAXHOSTNAMELEN + 1);
@@ -143,17 +145,25 @@ int main(int argc,char**argv){
     //读config文件
     log_msg(LOG_LEVEL_INFO, "read configure file: %s", conf->config_file);
     readconf(conf->config_file, conf);
+    /*
     node* it=conf->filelist;
     while(it!=NULL){
         printf("%s\n", it->data);
         it=it->next;
+    }
+    */
+    if(conf->action==NO_ACTION){
+        printf("NO ACTION\n");
+        exit(1);
+    }else (conf->action!=DO_INIT && conf->action!=DO_CHECK){
+        printf("BAD ACTION\n");
+        exit(1);
     }
 
     //INITAIL TEE
     TEEC_Result res;
     TEEC_Context ctx;
     TEEC_Session sess;
-    TEEC_Operation op;
     TEEC_UUID uuid = TA_UUID; // 您的TA的UUID
     uint32_t err_origin;
 
@@ -161,6 +171,7 @@ int main(int argc,char**argv){
     res = TEEC_InitializeContext(NULL, &ctx);
     if (res != TEEC_SUCCESS) {
         printf("TEEC_InitializeContext ERROR\n");
+        exit(1);
     }
 
     // 打开会话
@@ -168,9 +179,18 @@ int main(int argc,char**argv){
     //TEEC_LOGIN_USER可以定义用户登录
     if (res != TEEC_SUCCESS) {
         printf("TEEC_OpenSession ERROR\n");
+        exit(1);
     }
 
     if(conf->action==DO_INIT){
+        //TEE初始化一个DB
+        res=TEEC_InvokeCommand(&sess, TA_CMD_INITDB, NULL, &err_origin);
+        if (res != TEEC_SUCCESS) {
+            printf("TEEC_InvokeCommand TA_CMD_INITDB ERROR\n")
+            exit(1);
+        }
+
+        //存储每一个db_line
         node* it=conf->filelist;
         while(it!=NULL){
             db_line *line=gen_file_to_db_line(it->data);
@@ -182,7 +202,7 @@ int main(int argc,char**argv){
             op.params[0].tmpref.buffer = line;
             op.params[0].tmpref.size = sizeof(db_line);
 
-            res=TEEC_InvokeCommand(&sess, CMD_STORE_DB, &op, &err_origin);
+            res=TEEC_InvokeCommand(&sess, TA_CMD_STORE, &op, &err_origin);
             if (res != TEEC_SUCCESS) {
                 printf("TEEC_InvokeCommand ERROR\n")
             }
@@ -223,7 +243,7 @@ int main(int argc,char**argv){
             it=it->next;
         }
     }else{
-        printf("NO ACTION\n");
+        printf("BAD ACTION\n");
         exit(1);
     }
 
