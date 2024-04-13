@@ -25,6 +25,7 @@ TEE_Result init_db_obj(){
     //index_table
     TEE_Result res;
     uint32_t flag = TEE_DATA_FLAG_ACCESS_WRITE | TEE_DATA_FLAG_ACCESS_READ | TEE_DATA_FLAG_CREATE;
+    //TODO: index obj需不需要打开？直接存就行？
     res = TEE_CreatePersistentObject(TEE_STORAGE_PRIVATE, INDEX_TABLE_ID, strlen(INDEX_TABLE_ID), flag, TEE_HANDLE_NULL, NULL, 0, index_object);
     if(res!=TEE_SUCCESS) return TEE_ERROR_GENERIC;
     res = TEE_CreatePersistentObject(TEE_STORAGE_PRIVATE, DB_ID, strlen(DB_ID), flag, TEE_HANDLE_NULL, NULL, 0, db_object);
@@ -53,7 +54,7 @@ static uint32_t get_hash_step(const char *str) {
 }
 
 
-void insert_to_hash_table(const char* path, uint32_t offset) {
+uint32_t insert_to_hash_table(const char* path) {
     uint32_t hash = get_hash_index(path);
     uint32_t index = hash % TABLE_SIZE;
     uint32_t step = get_hash_step(path) % TABLE_SIZE;
@@ -61,17 +62,21 @@ void insert_to_hash_table(const char* path, uint32_t offset) {
     if (step == 0) step = 1;
     
     while (hash_table[index].filepath_offset!=0) {
+        //TODO 检查是否重复
         index = (index + step) % TABLE_SIZE;
     }
-    hash_table[index].hash_index=hash;
-    hash_table[index].filepath_offset=
-    hash_table[index].db_line_offset=
-
+    index_table.hash_table[index].hash_index=hash;
+    //index_table.hash_table[index].filepath_offset=
+    //index_table.hash_table[index].db_line_offset=
+    return index;
 }
 
 static TEE_Result store_db_line(uint32_t param_types, TEE_Param params[4]) {
     //检查是否已经存在
     //check db
+    uint32_t index= insert_to_hash_table(path);
+
+
     
     if(cnt_file>=TABLE_SIZE){
         DMSG("File numbers exceeds limit\n");

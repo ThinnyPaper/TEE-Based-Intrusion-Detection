@@ -25,9 +25,9 @@ typedef struct {
 #define DB_ID "idtt_database"
 
 
-IndexTable index_table;
-TEE_ObjectHandle *index_object=NULL;
-TEE_ObjectHandle *db_object=NULL;
+extern IndexTable index_table;
+extern TEE_ObjectHandle *index_object;
+extern TEE_ObjectHandle *db_object;
 
 bool check_db_exist();
 TEE_Result init_db_obj();

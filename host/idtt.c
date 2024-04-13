@@ -198,13 +198,15 @@ int main(int argc,char**argv){
             //to TEE
             TEEC_Operation op;
             memset(&op, 0, sizeof(op));
-            op.paramTypes = TEEC_PARAM_TYPES(TEEC_MEMREF_TEMP_INPUT, TEEC_NONE, TEEC_NONE, TEEC_NONE);
-            op.params[0].tmpref.buffer = line;
-            op.params[0].tmpref.size = sizeof(db_line);
+            op.paramTypes = TEEC_PARAM_TYPES(TEEC_MEMREF_TEMP_INPUT, TEEC_MEMREF_TEMP_INPUT, TEEC_NONE, TEEC_NONE);
+            op.params[0].tmpref.buffer = it->data;
+            op.params[0].tmpref.size = strlen(it->data);
+            op.params[1].tmpref.buffer = line;
+            op.params[1].tmpref.size = sizeof(db_line);
 
             res=TEEC_InvokeCommand(&sess, TA_CMD_STORE, &op, &err_origin);
             if (res != TEEC_SUCCESS) {
-                printf("TEEC_InvokeCommand ERROR\n")
+                printf("TEEC_InvokeCommand TA_CMD_STORE ERROR\n")
             }
             it=it->next;
         }

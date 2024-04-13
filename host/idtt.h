@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <list.h>
 
-#define RETOK 0
-#define RETFAIL -1
+#define RETOK 1
+#define RETFAIL 0
 
 #define NO_ACTION 0
 #define DO_INIT (1<<0)

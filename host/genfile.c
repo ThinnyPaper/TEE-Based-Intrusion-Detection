@@ -37,7 +37,7 @@ db_line* gen_file_to_db_line(char* file){
     }
     db_line* ret=checked_malloc(sizeof(db_line));
 
-    strncpy(ret->fullpath, file, sizeof(file));
+    //strncpy(ret->fullpath, file, sizeof(file));
     /*
     ret->perm = (unsigned int)fileInfo.st_mode;
     ret->uid = (unsigned int)fileInfo.st_uid;      
@@ -74,7 +74,6 @@ db_line* gen_file_to_db_line(char* file){
 
 
     //mhash
-    //TODO 优化读取
     MHASH td_sha256, td_whirlpool;
     unsigned char buffer[BLOCK_SIZE];
     unsigned char *hash_sha256, *hash_whirlpool;
@@ -105,7 +104,6 @@ db_line* gen_file_to_db_line(char* file){
     hash_sha256 = (unsigned char *)mhash_end(td_sha256);
     hash_whirlpool = (unsigned char *)mhash_end(td_whirlpool);
     memcpy(ret->hash_sha256, hash_sha256, 32); 
-    ret->sha256=hash_sha256;
     free(hash_sha256); 
     memcpy(ret->hash_whirlpool, hash_whirlpool, 64); 
     free(hash_whirlpool); 
