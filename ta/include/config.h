@@ -5,3 +5,5 @@
 
 /* syslog priority */
 #define SYSLOG_PRIORITY LOG_NOTICE
+
+#define MAX_FILE_NUMEBER=20

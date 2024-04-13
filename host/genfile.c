@@ -38,6 +38,7 @@ db_line* gen_file_to_db_line(char* file){
     db_line* ret=checked_malloc(sizeof(db_line));
 
     strncpy(ret->fullpath, file, sizeof(file));
+    /*
     ret->perm = (unsigned int)fileInfo.st_mode;
     ret->uid = (unsigned int)fileInfo.st_uid;      
     ret->gid = (unsigned int)fileInfo.st_gid;       
@@ -48,6 +49,17 @@ db_line* gen_file_to_db_line(char* file){
     ret->nlink = (unsigned int)fileInfo.st_nlink;   
     ret->size = (long long)fileInfo.st_size;     
     ret->bcount = (long long)fileInfo.st_blocks;   
+    */
+    ret->perm = (unsigned int)fileInfo.st_mode;
+    ret->uid = fileInfo.st_uid;      
+    ret->gid = fileInfo.st_gid;       
+    ret->atime = fileInfo.st_atime;        
+    ret->ctime = fileInfo.st_ctime;
+    ret->mtime = fileInfo.st_mtime;        
+    ret->inode = fileInfo.st_ino;   
+    ret->nlink = fileInfo.st_nlink;   
+    ret->size = fileInfo.st_size;     
+    ret->bcount = fileInfo.st_blocks;  
     /*  
     printf("mode%d\n",ret->perm);
     printf("uid%d\n",ret->uid);

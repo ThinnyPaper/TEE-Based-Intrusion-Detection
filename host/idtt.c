@@ -24,7 +24,7 @@
  */
 
 #include "idtt.h"
-//#include <tee_client_api.h>
+#include <tee_client_api.h>
 #include <unistd.h>
 #include <getopt.h> 
 #include <limits.h>
@@ -33,6 +33,7 @@
 #include "db.h"
 #include "readconf.h"
 #include "util.h"
+#include "ta_command.h"
 
 #ifndef MAXHOSTNAMELEN
 #define MAXHOSTNAMELEN 256
@@ -144,18 +145,47 @@ int main(int argc,char**argv){
     readconf(conf->config_file, conf);
     node* it=conf->filelist;
     while(it!=NULL){
-
         printf("%s\n", it->data);
         it=it->next;
+    }
+
+    //INITAIL TEE
+    TEEC_Result res;
+    TEEC_Context ctx;
+    TEEC_Session sess;
+    TEEC_Operation op;
+    TEEC_UUID uuid = TA_UUID; // 您的TA的UUID
+    uint32_t err_origin;
+
+    // 初始化与TEE的连接
+    res = TEEC_InitializeContext(NULL, &ctx);
+    if (res != TEEC_SUCCESS) {
+        printf("TEEC_InitializeContext ERROR\n");
+    }
+
+    // 打开会话
+    res = TEEC_OpenSession(&ctx, &sess, &uuid, TEEC_LOGIN_PUBLIC, NULL, NULL, &err_origin);
+    //TEEC_LOGIN_USER可以定义用户登录
+    if (res != TEEC_SUCCESS) {
+        printf("TEEC_OpenSession ERROR\n");
     }
 
     if(conf->action==DO_INIT){
         node* it=conf->filelist;
         while(it!=NULL){
-            gen_file_to_db_line(it->data);
+            db_line *line=gen_file_to_db_line(it->data);
            // line->
             //to TEE
+            TEEC_Operation op;
+            memset(&op, 0, sizeof(op));
+            op.paramTypes = TEEC_PARAM_TYPES(TEEC_MEMREF_TEMP_INPUT, TEEC_NONE, TEEC_NONE, TEEC_NONE);
+            op.params[0].tmpref.buffer = line;
+            op.params[0].tmpref.size = sizeof(db_line);
 
+            res=TEEC_InvokeCommand(&sess, CMD_STORE_DB, &op, &err_origin);
+            if (res != TEEC_SUCCESS) {
+                printf("TEEC_InvokeCommand ERROR\n")
+            }
             it=it->next;
         }
     }else if(conf->action==DO_CHECK){
@@ -199,73 +229,10 @@ int main(int argc,char**argv){
 
 
 
+    // Clean up TEE
+    TEEC_CloseSession(&sess);
+    TEEC_FinalizeContext(&ctx);
 
 
-
-/*
-
-
-    if (!init_report_urls()) {
-        exit(INVALID_CONFIGURELINE_ERROR);
-    }
-    //试试prefix前缀能不能打开
-    if (conf->action&(DO_INIT|DO_COMPARE) && conf->root_prefix_length > 0) {
-        DIR *dir;
-        if((dir = opendir(conf->root_prefix)) != NULL) {
-            closedir(dir);
-        } else {
-            log_msg(LOG_LEVEL_ERROR,"opendir() for root_prefix %s failed: %s", conf->root_prefix, strerror(errno));
-            exit(INVALID_CONFIGURELINE_ERROR);
-        }
-    }
-    if(conf->action&DO_INIT){
-      if(db_init(&(conf->database_out), false,
-#ifdef WITH_ZLIB
-        conf->gzip_dbout
-#else
-        false
-#endif
-       ) == RETFAIL) {
-	exit(IO_ERROR);
-      }
-      if(db_writespec(conf)==RETFAIL){
-	log_msg(LOG_LEVEL_ERROR,("Error while writing database. Exiting.."));
-	exit(IO_ERROR);
-      }
-    }
-    if((conf->action&DO_INIT)||(conf->action&DO_COMPARE)){
-      if(db_disk_init()==RETFAIL)
-	exit(IO_ERROR);
-    }
-    if((conf->action&DO_COMPARE)||(conf->action&DO_DIFF)){
-      if(db_init(&(conf->database_in), true, false)==RETFAIL)
-	exit(IO_ERROR);
-    }
-    if(conf->action&DO_DIFF){
-      if(db_init(&(conf->database_new), true, false)==RETFAIL)
-	exit(IO_ERROR);
-    }
-      
-    //log_msg(LOG_LEVEL_INFO, "populate tree");
-    //populate_tree(conf->tree, false);
-
-    if(conf->action&DO_INIT) {
-        log_msg(LOG_LEVEL_INFO, "write new entries to database: %s:%s", get_url_type_string((conf->database_out.url)->type), (conf->database_out.url)->value);
-        write_tree(conf->tree);
-        
-    }
-
-    db_close();
-
-    log_msg(LOG_LEVEL_INFO, "generate reports");
-
-    int exitcode = gen_report(conf->tree);
-
-    log_msg(LOG_LEVEL_INFO, "exit AIDE with exit code '%d'", exitcode);
-
-    exit(exitcode);
-  
-  return RETOK;
-  */
 }
 // vi: ts=8 sw=8
