@@ -1,6 +1,6 @@
 project (optee_idtt C)
 
-set (SRC host/main.c host/genfile.c host/list.c host/readconf.c host/util.c)
+set (SRC host/idtt.c host/genfile.c host/list.c host/readconf.c host/util.c)
 
 add_executable (${PROJECT_NAME} ${SRC})
 
