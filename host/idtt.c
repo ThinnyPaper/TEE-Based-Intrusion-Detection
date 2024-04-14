@@ -40,6 +40,7 @@
 #endif
 idtt_config* conf;
 char* filename;
+uint32_t check_result;
 
 static void usage(int exitvalue){
   fprintf(stdout,
@@ -126,6 +127,7 @@ static void setdefaults_idtt_config(){
 int main(int argc,char**argv){
     int errorno=0;
     umask(0177); //仅本用户可读写
+    check_result=0;
 
     conf=(db_config*)checked_malloc(sizeof(db_config));
     read_param(argc, argv);
@@ -200,7 +202,7 @@ int main(int argc,char**argv){
             memset(&op, 0, sizeof(op));
             op.paramTypes = TEEC_PARAM_TYPES(TEEC_MEMREF_TEMP_INPUT, TEEC_MEMREF_TEMP_INPUT, TEEC_NONE, TEEC_NONE);
             op.params[0].tmpref.buffer = it->data;
-            op.params[0].tmpref.size = strlen(it->data);
+            op.params[0].tmpref.size = strlen(it->data)+1;
             op.params[1].tmpref.buffer = line;
             op.params[1].tmpref.size = sizeof(db_line);
 
@@ -210,6 +212,7 @@ int main(int argc,char**argv){
             }
             it=it->next;
         }
+
     }else if(conf->action==DO_CHECK){
         if(filename==NULL){
             printf("No file path arg\n");
@@ -223,8 +226,29 @@ int main(int argc,char**argv){
             filename=fullfilepath;
             //printf("fullpath: %s\n",fullfilepath);
             //gen filename to db_line;
-            gen_file_to_db_line(filename);
+            db_line *line=gen_file_to_db_line(filename);
             //to TEE
+            TEEC_Operation op;
+            memset(&op, 0, sizeof(op));
+            op.paramTypes = TEEC_PARAM_TYPES(TEEC_MEMREF_TEMP_INPUT, TEEC_MEMREF_TEMP_INPUT, TEEC_VALUE_OUTPUT, TEEC_NONE);
+            op.params[0].tmpref.buffer = filename;
+            op.params[0].tmpref.size = strlen(filename)+1;
+            op.params[1].tmpref.buffer = line;
+            op.params[1].tmpref.size = sizeof(db_line);
+
+            res=TEEC_InvokeCommand(&sess, TA_CMD_STORE, &op, &err_origin);
+            if (res != TEEC_SUCCESS) {
+                printf("TEEC_InvokeCommand TA_CMD_STORE ERROR\n")
+            }
+            uint32_t check_result=op.params[2].value.a;
+            if(check_result==TA_CHECK_RESULT_CONSISTENT){
+                printf("TA_CHECK_RESULT_CONSISTENT\n");
+            }else if(check_result==TA_CHECK_RESULT_MODIFIED){
+                printf("TA_CHECK_RESULT_MODIFIED\n");
+            }else if(TA_CHECK_RESULT_NO_MATCH_FILE){
+                printf("TA_CHECK_RESULT_NO_MATCH_FILE\n");
+            }
+
         }
     }else if(conf->action==DO_CHECKALL){
         node* it=conf->filelist;
@@ -254,7 +278,8 @@ int main(int argc,char**argv){
     // Clean up TEE
     TEEC_CloseSession(&sess);
     TEEC_FinalizeContext(&ctx);
-
+    
+    return check_result;
 
 }
 // vi: ts=8 sw=8
