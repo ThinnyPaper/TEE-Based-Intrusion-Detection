@@ -127,12 +127,11 @@ static void setdefaults_idtt_config(){
 
 static TEEC_Result do_check_one(TEEC_Session *sess, char* filepath){
     printf("Checking %s\n",filepath);
-    TEEC_Result res;
-    uint32_t err_origin;
     db_line *line=gen_file_to_db_line(filepath);
     //to TEE
     TEEC_Result res;
     TEEC_Operation op;
+    uint32_t err_origin;
     memset(&op, 0, sizeof(op));
     op.paramTypes = TEEC_PARAM_TYPES(TEEC_MEMREF_TEMP_INPUT, TEEC_MEMREF_TEMP_INPUT, TEEC_VALUE_OUTPUT, TEEC_NONE);
     op.params[0].tmpref.buffer = filepath;
@@ -151,18 +150,18 @@ static TEEC_Result do_check_one(TEEC_Session *sess, char* filepath){
     }else if(check_result==TA_CHECK_RESULT_MODIFIED){
         printf("TA_CHECK_RESULT_MODIFIED\n");
         uint32_t check_flag=op.params[2].value.b;
-        if (check_flag&CHECK_PERM_INCONSIS>0) printf("perm differs\n");
-        if (check_flag&CHECK_UID_INCONSIS>0) printf("uid differs\n");
-        if (check_flag&CHECK_GID_INCONSIS>0) printf("gid differs\n");
-        if (check_flag&CHECK_ATIME_INCONSIS>0) printf("atime differs\n");
-        if (check_flag&CHECK_CTIME_INCONSIS>0) printf("ctime differs\n");
-        if (check_flag&CHECK_MTIME_INCONSIS>0) printf("mtime differs\n");
-        if (check_flag&CHECK_INODE_INCONSIS>0) printf("inode differs\n");
-        if (check_flag&CHECK_NLINK_INCONSIS>0) printf("nlink differs\n");
-        if (check_flag&CHECK_SIZE_INCONSIS>0) printf("size differs\n");
-        if (check_flag&CHECK_BCOUNT_INCONSIS>0) printf("bcount differs\n");
-        if (check_flag&CHECK_SHA256_INCONSIS>0) printf("hash_sha256 differs\n");
-        if (check_flag&CHECK_WHIRLPOOL_INCONSIS>0) printf("hash_whirlpool differs\n");
+        if ((check_flag&CHECK_PERM_INCONSIS)>0) printf("perm differs\n");
+        if ((check_flag&CHECK_UID_INCONSIS)>0) printf("uid differs\n");
+        if ((check_flag&CHECK_GID_INCONSIS)>0) printf("gid differs\n");
+        if ((check_flag&CHECK_ATIME_INCONSIS)>0) printf("atime differs\n");
+        if ((check_flag&CHECK_CTIME_INCONSIS)>0) printf("ctime differs\n");
+        if ((check_flag&CHECK_MTIME_INCONSIS)>0) printf("mtime differs\n");
+        if ((check_flag&CHECK_INODE_INCONSIS)>0) printf("inode differs\n");
+        if ((check_flag&CHECK_NLINK_INCONSIS)>0) printf("nlink differs\n");
+        if ((check_flag&CHECK_SIZE_INCONSIS)>0) printf("size differs\n");
+        if ((check_flag&CHECK_BCOUNT_INCONSIS)>0) printf("bcount differs\n");
+        if ((check_flag&CHECK_SHA256_INCONSIS)>0) printf("hash_sha256 differs\n");
+        if ((check_flag&CHECK_WHIRLPOOL_INCONSIS)>0) printf("hash_whirlpool differs\n");
 
     }else if(TA_CHECK_RESULT_NO_MATCH_FILE){
         printf("TA_CHECK_RESULT_NO_MATCH_FILE\n");
