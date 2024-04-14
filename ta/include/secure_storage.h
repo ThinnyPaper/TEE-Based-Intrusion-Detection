@@ -2,6 +2,7 @@
 #define SECURE_STORAGE_H_INCLUDE
 
 #include <tee_internal_api.h>
+#include <tee_internal_api_extensions.h>
 
 #include "config.h"
 
@@ -12,6 +13,7 @@ typedef struct {
     uint32_t hash_index;
     uint32_t filepath_offset;   
     uint32_t db_line_offset;
+    size_t pathlen;
 } HashIndexEntry;
 
 #define TABLE_SIZE MAX_FILE_NUMEBER

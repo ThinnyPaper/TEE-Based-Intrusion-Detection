@@ -67,6 +67,7 @@ TEE_Result TA_InvokeCommandEntryPoint(void *session, uint32_t command_id, uint32
 			
 		}
 		return ret;
+		break;
 		}
     case TA_CMD_STORE: {
 		if(!it_loaded){
@@ -76,7 +77,7 @@ TEE_Result TA_InvokeCommandEntryPoint(void *session, uint32_t command_id, uint32
 			}else{
 				IMSG("Load index failed.\n");
 				return TEE_ERROR_ACCESS_DENIED
-			}
+			}		
 		}
 		if(!db_opened){
 			uint32_t db_open_flag = TEE_DATA_FLAG_ACCESS_WRITE | TEE_DATA_FLAG_ACCESS_READ;
@@ -122,4 +123,6 @@ TEE_Result TA_InvokeCommandEntryPoint(void *session, uint32_t command_id, uint32
         return TEE_ERROR_NOT_SUPPORTED;
     }
 	}
+	//not suppose to get here
+	return TEE_ERROR_GENERIC;
 }

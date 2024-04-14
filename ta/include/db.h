@@ -31,9 +31,6 @@ typedef struct db_line {
 
 } db_line;*/
 typedef struct db_line {
-  //char* filename;
-  //char fullpath[PATH_MAX]; //TODO：改成指针，在avoke_command中分开传递
-
   unsigned int perm; //权限
   uid_t uid; //文件所有者的用户ID
   gid_t gid; //文件所属组的组ID
@@ -49,7 +46,6 @@ typedef struct db_line {
   //unsigned char* sha256;
   unsigned char hash_sha256[32];
   unsigned char hash_whirlpool[64];
-
 
 } db_line;
 

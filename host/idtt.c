@@ -39,8 +39,6 @@
 #define MAXHOSTNAMELEN 256
 #endif
 idtt_config* conf;
-char* filename;
-uint32_t check_result;
 
 static void usage(int exitvalue){
   fprintf(stdout,
@@ -124,10 +122,58 @@ static void setdefaults_idtt_config(){
 
 }
 
+static TEEC_Result do_check_one(TEEC_Session *sess, char* filepath){
+    printf("Checking %s\n",filepath);
+    TEEC_Result res;
+    uint32_t err_origin;
+    db_line *line=gen_file_to_db_line(filepath);
+    //to TEE
+    TEEC_Result res;
+    TEEC_Operation op;
+    memset(&op, 0, sizeof(op));
+    op.paramTypes = TEEC_PARAM_TYPES(TEEC_MEMREF_TEMP_INPUT, TEEC_MEMREF_TEMP_INPUT, TEEC_VALUE_OUTPUT, TEEC_NONE);
+    op.params[0].tmpref.buffer = filepath;
+    op.params[0].tmpref.size = strlen(filepath)+1;
+    op.params[1].tmpref.buffer = line;
+    op.params[1].tmpref.size = sizeof(db_line);
+
+    res=TEEC_InvokeCommand(sess, TA_CMD_STORE, &op, &err_origin);
+    if (res != TEEC_SUCCESS) {
+        printf("TEEC_InvokeCommand TA_CMD_STORE ERROR\n");
+        return res;
+    }
+    uint32_t check_result=op.params[2].value.a;
+    if(check_result==TA_CHECK_RESULT_CONSISTENT){
+        printf("TA_CHECK_RESULT_CONSISTENT\n");
+    }else if(check_result==TA_CHECK_RESULT_MODIFIED){
+        printf("TA_CHECK_RESULT_MODIFIED\n");
+        uint32_t check_flag=op.params[2].value.b;
+        if (check_flag&CHECK_PERM_INCONSIS>0) printf("perm differs\n");
+        if (check_flag&CHECK_UID_INCONSIS>0) printf("uid differs\n");
+        if (check_flag&CHECK_GID_INCONSIS>0) printf("gid differs\n");
+        if (check_flag&CHECK_ATIME_INCONSIS>0) printf("atime differs\n");
+        if (check_flag&CHECK_CTIME_INCONSIS>0) printf("ctime differs\n");
+        if (check_flag&CHECK_MTIME_INCONSIS>0) printf("mtime differs\n");
+        if (check_flag&CHECK_INODE_INCONSIS>0) printf("inode differs\n");
+        if (check_flag&CHECK_NLINK_INCONSIS>0) printf("nlink differs\n");
+        if (check_flag&CHECK_SIZE_INCONSIS>0) printf("size differs\n");
+        if (check_flag&CHECK_BCOUNT_INCONSIS>0) printf("bcount differs\n");
+        if (check_flag&CHECK_SHA256_INCONSIS>0) printf("hash_sha256 differs\n");
+        if (check_flag&CHECK_WHIRLPOOL_INCONSIS>0) printf("hash_whirlpool differs\n");
+
+    }else if(TA_CHECK_RESULT_NO_MATCH_FILE){
+        printf("TA_CHECK_RESULT_NO_MATCH_FILE\n");
+    }else{
+        printf("GET BAD check_result\n");
+        return TEEC_ERROR_GENERIC;
+    }
+    return TEEC_SUCCESS;
+}
+
 int main(int argc,char**argv){
     int errorno=0;
     umask(0177); //仅本用户可读写
-    check_result=0;
+    check_result=TA_CHECK_RESULT_NO_MATCH_FILE;
 
     conf=(db_config*)checked_malloc(sizeof(db_config));
     read_param(argc, argv);
@@ -166,7 +212,7 @@ int main(int argc,char**argv){
     TEEC_Result res;
     TEEC_Context ctx;
     TEEC_Session sess;
-    TEEC_UUID uuid = TA_UUID; // 您的TA的UUID
+    TEEC_UUID uuid = TA_UUID; // TODO:您的TA的UUID
     uint32_t err_origin;
 
     // 初始化与TEE的连接
@@ -224,48 +270,19 @@ int main(int argc,char**argv){
             realpath(filename, fullfilepath);
             free(filename);
             filename=fullfilepath;
-            //printf("fullpath: %s\n",fullfilepath);
-            //gen filename to db_line;
-            db_line *line=gen_file_to_db_line(filename);
-            //to TEE
-            TEEC_Operation op;
-            memset(&op, 0, sizeof(op));
-            op.paramTypes = TEEC_PARAM_TYPES(TEEC_MEMREF_TEMP_INPUT, TEEC_MEMREF_TEMP_INPUT, TEEC_VALUE_OUTPUT, TEEC_NONE);
-            op.params[0].tmpref.buffer = filename;
-            op.params[0].tmpref.size = strlen(filename)+1;
-            op.params[1].tmpref.buffer = line;
-            op.params[1].tmpref.size = sizeof(db_line);
-
-            res=TEEC_InvokeCommand(&sess, TA_CMD_STORE, &op, &err_origin);
-            if (res != TEEC_SUCCESS) {
-                printf("TEEC_InvokeCommand TA_CMD_STORE ERROR\n")
+            res=do_check_one(&sess, filename);
+            if(res!=TEEC_SUCCESS){
+                printf("Something went wrong while checking %s\n",filename);
+                return 1;
             }
-            uint32_t check_result=op.params[2].value.a;
-            if(check_result==TA_CHECK_RESULT_CONSISTENT){
-                printf("TA_CHECK_RESULT_CONSISTENT\n");
-            }else if(check_result==TA_CHECK_RESULT_MODIFIED){
-                printf("TA_CHECK_RESULT_MODIFIED\n");
-            }else if(TA_CHECK_RESULT_NO_MATCH_FILE){
-                printf("TA_CHECK_RESULT_NO_MATCH_FILE\n");
-            }
-
         }
     }else if(conf->action==DO_CHECKALL){
         node* it=conf->filelist;
         while(it!=NULL){
-            //gen it to db_line;
-               
-
-            db_line* line=gen_file_to_db_line(it->data);
-            printf("SHA-256 Hash: ");
-
-            for (int i = 0; i < 32; i++) {
-                printf("%02x", line->hash_sha256[i]);
+            res=do_check_one(&sess, it->data);
+            if(res!=TEEC_SUCCESS){
+                printf("Something went wrong while checking %s\n",filename);
             }
-            printf("\n");
-            //to TEE
-
-
             it=it->next;
         }
     }else{
@@ -278,8 +295,8 @@ int main(int argc,char**argv){
     // Clean up TEE
     TEEC_CloseSession(&sess);
     TEEC_FinalizeContext(&ctx);
-    
-    return check_result;
+
+    return 0;
 
 }
 // vi: ts=8 sw=8
