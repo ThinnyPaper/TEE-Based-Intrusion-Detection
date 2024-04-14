@@ -176,7 +176,7 @@ int main(int argc,char**argv){
     //umask(0177); //仅本用户可读写
     //check_result=TA_CHECK_RESULT_NO_MATCH_FILE;
 
-    conf=(idtt_config*)checked_malloc(sizeof(db_config));
+    conf=(idtt_config*)checked_malloc(sizeof(idtt_config));
     read_param(argc, argv);
 
     setdefaults_idtt_config();
@@ -255,7 +255,7 @@ int main(int argc,char**argv){
 
             res=TEEC_InvokeCommand(&sess, TA_CMD_STORE, &op, &err_origin);
             if (res != TEEC_SUCCESS) {
-                printf("TEEC_InvokeCommand TA_CMD_STORE ERROR\n")
+                printf("TEEC_InvokeCommand TA_CMD_STORE ERROR\n");
             }
             it=it->next;
         }
