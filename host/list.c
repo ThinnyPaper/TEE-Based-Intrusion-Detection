@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include "list.h"
-#include "log.h"
 #include "util.h"
 
 /* list
@@ -76,7 +75,7 @@ node* list_delete_item(node* item){
 
 
   if (item==NULL) {
-      log_msg(LOG_LEVEL_DEBUG, "tried to remove from empty list");
+      printf("tried to remove from empty list");
     return item;
   }
   

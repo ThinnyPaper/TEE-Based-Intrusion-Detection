@@ -4,7 +4,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <glob.h>
-#include "log.h"
 #include "util.h"
 
 
@@ -21,14 +20,11 @@ static node* deal_regex_path(const char* path, node* pathlist){
             //char* fullpath="asd";//glob_result->gl_pathv[i];
             pathlist=list_append(pathlist,glob_result->gl_pathv[i]);
             printf("Found match file: %s\n", glob_result->gl_pathv[i]);
-            log_msg(LOG_LEVEL_INFO, "Found match file: %s", glob_result->gl_pathv[i]);
         }
     } else if(rt==GLOB_ABORTED){
         printf("Can not open path: %s\n", path);
-        log_msg(LOG_LEVEL_INFO, "Can not open path: %s\n", path);
     } else{
         printf("No match file found using %s%d\n", path,GLOB_ABORTED);
-        log_msg(LOG_LEVEL_INFO, "No match file found using %s", path);
     }
     free(glob_result);
   return pathlist;
@@ -44,7 +40,7 @@ void readconf(char* configfile, db_config* conf){
 
   if (!config_read_file(&cfg, configfile))
   {
-      log_msg(LOG_LEVEL_ERROR,"read conig file error: %s\n", config_error_file(&cfg));
+      printf("read conig file error: %s\n", config_error_file(&cfg));
       config_destroy(&cfg);
       exit(1);
   }

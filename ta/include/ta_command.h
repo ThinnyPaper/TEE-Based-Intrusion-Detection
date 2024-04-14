@@ -1,5 +1,5 @@
-#ifndef TA_COMMAND_H_INCLUDE
-#define TA_COMMAND_H_INCLUDE
+#ifndef _TA_COMMAND_H
+#define _TA_COMMAND_H
 
 #define TA_CMD_INITDB 0
 #define TA_CMD_STORE 1

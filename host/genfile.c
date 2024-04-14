@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include "db.h"
+#include "db_line.h"
 #define BLOCK_SIZE 1024
 /*/
   //char* filename;

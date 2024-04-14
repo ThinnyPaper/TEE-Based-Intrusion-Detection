@@ -29,11 +29,11 @@
 #include <getopt.h> 
 #include <limits.h>
 
-#include "log.h"
-#include "db.h"
+#include "db_line.h"
 #include "readconf.h"
 #include "util.h"
 #include "ta_command.h"
+#include "idtt_ta.h"
 
 #ifndef MAXHOSTNAMELEN
 #define MAXHOSTNAMELEN 256
@@ -76,7 +76,7 @@ static void read_param(int argc,char**argv){
             case 'i':{
                 if(conf->action==0){ 
                     conf->action=DO_INIT; 
-                    log_msg(LOG_LEVEL_INFO,"command: init database"); 
+                    printf("command: init database"); 
                     break;
                 } else { 
                     exit(-1); 
@@ -85,7 +85,7 @@ static void read_param(int argc,char**argv){
             case 'a':{
                 if(conf->action==0){ 
                     conf->action=DO_CHECKALL; 
-                    log_msg(LOG_LEVEL_INFO,"command: check all files"); 
+                    printf("command: check all files"); 
                     break;
                 } else { 
                     exit(-1); 
@@ -96,7 +96,7 @@ static void read_param(int argc,char**argv){
                     conf->action=DO_CHECK; 
                     filename=checked_malloc(sizeof(optarg));
                     strncpy(filename,optarg,sizeof(optarg)-1);
-                    log_msg(LOG_LEVEL_INFO,"command: check file %s", optarg); 
+                    printf("command: check file %s", optarg); 
                     break;
                 } else { 
                     exit(-1); 
@@ -183,15 +183,15 @@ int main(int argc,char**argv){
     //get hostname 
     conf->hostname = checked_malloc(sizeof(char) * MAXHOSTNAMELEN + 1);
     if (gethostname(conf->hostname,MAXHOSTNAMELEN) == -1) {
-        log_msg(LOG_LEVEL_WARNING,"gethostname failed: %s", strerror(errorno));
+        printf("gethostname failed: %s", strerror(errorno));
         free(conf->hostname);
         conf->hostname = NULL;
     } else {
-        log_msg(LOG_LEVEL_DEBUG, "hostname: '%s'", conf->hostname);
+        printf( "hostname: '%s'", conf->hostname);
     }
 
     //读config文件
-    log_msg(LOG_LEVEL_INFO, "read configure file: %s", conf->config_file);
+    printf("read configure file: %s", conf->config_file);
     readconf(conf->config_file, conf);
     /*
     node* it=conf->filelist;
@@ -212,7 +212,7 @@ int main(int argc,char**argv){
     TEEC_Result res;
     TEEC_Context ctx;
     TEEC_Session sess;
-    TEEC_UUID uuid = TA_UUID; // TODO:您的TA的UUID
+    TEEC_UUID uuid = IDTT_TA_UUID; // TODO:您的TA的UUID
     uint32_t err_origin;
 
     // 初始化与TEE的连接

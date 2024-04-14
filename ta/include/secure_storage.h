@@ -1,5 +1,5 @@
-#ifndef SECURE_STORAGE_H_INCLUDE
-#define SECURE_STORAGE_H_INCLUDE
+#ifndef _SECURE_STORAGE_H
+#define _SECURE_STORAGE_H
 
 #include <tee_internal_api.h>
 #include <tee_internal_api_extensions.h>
@@ -39,13 +39,6 @@ void close_index_obj();
 void close_db_obj();
 TEE_Result init_db_obj();
 TEE_Result store_db_line(uint32_t param_types, TEE_Param params[4]);
-
-
-
-
-
-
-
-
+TEE_Result check_file(uint32_t param_types, TEE_Param params[4]);
 
 #endif
