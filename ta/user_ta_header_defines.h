@@ -33,7 +33,7 @@
 #define USER_TA_HEADER_DEFINES_H
 
 /* To get the TA UUID definition */
-#include <hello_world_ta.h>
+#include <idtt_ta.h>
 
 #define TA_UUID				TA_HELLO_WORLD_UUID
 
@@ -53,7 +53,7 @@
 #define TA_VERSION	"1.0"
 
 /* The gpd.ta.description property */
-#define TA_DESCRIPTION	"Example of OP-TEE Hello World Trusted Application"
+#define TA_DESCRIPTION	"OP-TEE idtt Trusted Application"
 
 /* Extra properties */
 #define TA_CURRENT_TA_EXT_PROPERTIES \
