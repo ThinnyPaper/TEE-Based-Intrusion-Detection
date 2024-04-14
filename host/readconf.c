@@ -30,7 +30,7 @@ static node* deal_regex_path(const char* path, node* pathlist){
   return pathlist;
 }
 
-void readconf(char* configfile, db_config* conf){
+void readconf(char* configfile, idtt_config* conf){
   //读文件列表
   config_t cfg;
   config_setting_t *setting;

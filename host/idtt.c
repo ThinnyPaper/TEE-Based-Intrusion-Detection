@@ -28,6 +28,8 @@
 #include <unistd.h>
 #include <getopt.h> 
 #include <limits.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "db_line.h"
 #include "readconf.h"
@@ -39,6 +41,7 @@
 #define MAXHOSTNAMELEN 256
 #endif
 idtt_config* conf;
+char* filename;
 
 static void usage(int exitvalue){
   fprintf(stdout,
@@ -108,7 +111,7 @@ static void read_param(int argc,char**argv){
 }
 
 static void setdefaults_idtt_config(){
-    //set db_config defalt;
+    //set idtt_config defalt;
     conf->hostname=NULL;
     conf->filelist=NULL;
     conf->config_file=
@@ -171,11 +174,10 @@ static TEEC_Result do_check_one(TEEC_Session *sess, char* filepath){
 }
 
 int main(int argc,char**argv){
-    int errorno=0;
-    umask(0177); //仅本用户可读写
-    check_result=TA_CHECK_RESULT_NO_MATCH_FILE;
+    //umask(0177); //仅本用户可读写
+    //check_result=TA_CHECK_RESULT_NO_MATCH_FILE;
 
-    conf=(db_config*)checked_malloc(sizeof(db_config));
+    conf=(idtt_config*)checked_malloc(sizeof(db_config));
     read_param(argc, argv);
 
     setdefaults_idtt_config();
@@ -183,7 +185,7 @@ int main(int argc,char**argv){
     //get hostname 
     conf->hostname = checked_malloc(sizeof(char) * MAXHOSTNAMELEN + 1);
     if (gethostname(conf->hostname,MAXHOSTNAMELEN) == -1) {
-        printf("gethostname failed: %s", strerror(errorno));
+        printf("gethostname failed");
         free(conf->hostname);
         conf->hostname = NULL;
     } else {
@@ -203,7 +205,7 @@ int main(int argc,char**argv){
     if(conf->action==NO_ACTION){
         printf("NO ACTION\n");
         exit(1);
-    }else (conf->action!=DO_INIT && conf->action!=DO_CHECK){
+    }else if (conf->action!=DO_INIT && conf->action!=DO_CHECK){
         printf("BAD ACTION\n");
         exit(1);
     }
@@ -234,7 +236,7 @@ int main(int argc,char**argv){
         //TEE初始化一个DB
         res=TEEC_InvokeCommand(&sess, TA_CMD_INITDB, NULL, &err_origin);
         if (res != TEEC_SUCCESS) {
-            printf("TEEC_InvokeCommand TA_CMD_INITDB ERROR\n")
+            printf("TEEC_InvokeCommand TA_CMD_INITDB ERROR\n");
             exit(1);
         }
 

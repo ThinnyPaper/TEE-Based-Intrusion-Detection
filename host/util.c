@@ -3,7 +3,7 @@
 #include <sys/types.h>
 #include <stdlib.h>
 #include <unistd.h>
-
+#include <stdio.h>
 
 #ifndef MAXHOSTNAMELEN
 #define MAXHOSTNAMELEN 256

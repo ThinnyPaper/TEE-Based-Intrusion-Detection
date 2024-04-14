@@ -3,7 +3,7 @@
 
 #include "idtt.h"
 
-void readconf(char*, db_config* );
+void readconf(char*, idtt_config* );
 
 
 #endif
