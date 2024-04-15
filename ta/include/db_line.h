@@ -5,10 +5,10 @@
 #include <sys/types.h>
 //#include <sys/stat.h>
 #include <limits.h>
-/*
+
 typedef struct db_line {
   //char* filename;
-  char fullpath[PATH_MAX];
+  //char fullpath[PATH_MAX];
 
   unsigned int perm; //权限
   unsigned int uid; //文件所有者的用户ID
@@ -22,12 +22,13 @@ typedef struct db_line {
   long long bcount;
   //byte* hashsums[num_hashes];//计算所有
   //unsigned char hash_md5[20];
-  unsigned char* sha256;
+  //unsigned char* sha256;
   unsigned char hash_sha256[32];
   unsigned char hash_whirlpool[64];
 
 
-} db_line;*/
+} db_line;
+/*
 typedef struct db_line {
   unsigned int perm; //权限
   uid_t uid; //文件所有者的用户ID
@@ -46,5 +47,5 @@ typedef struct db_line {
   unsigned char hash_whirlpool[64];
 
 } db_line;
-
+*/
 #endif

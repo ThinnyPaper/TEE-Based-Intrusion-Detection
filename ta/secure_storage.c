@@ -25,7 +25,7 @@ bool check_db_exist(){
 TEE_Result init_db_obj(){
     //index_table
     TEE_Result res;
-    uint32_t flag = TEE_DATA_FLAG_ACCESS_WRITE | TEE_DATA_FLAG_ACCESS_READ | TEE_DATA_FLAG_CREATE;
+    uint32_t flag = TEE_DATA_FLAG_ACCESS_WRITE | TEE_DATA_FLAG_ACCESS_READ | TEE_DATA_FLAG_OVERWRITE;
     //TODO: index obj需不需要打开？直接存就行？
     res = TEE_CreatePersistentObject(TEE_STORAGE_PRIVATE, INDEX_TABLE_ID, strlen(INDEX_TABLE_ID)+1, flag, TEE_HANDLE_NULL, NULL, 0, index_object);
     if(res!=TEE_SUCCESS) return TEE_ERROR_GENERIC;
@@ -71,7 +71,7 @@ bool store_index(){
                                    TEE_DATA_FLAG_ACCESS_WRITE | TEE_DATA_FLAG_ACCESS_READ | TEE_DATA_FLAG_OVERWRITE,
                                    index_object);
     if (res = TEE_ERROR_ITEM_NOT_FOUND) {
-        TEE_Result create_res = TEE_CreatePersistentObject(TEE_STORAGE_PRIVATE, INDEX_TABLE_ID, strlen(INDEX_TABLE_ID)+1, TEE_DATA_FLAG_ACCESS_WRITE | TEE_DATA_FLAG_ACCESS_READ | TEE_DATA_FLAG_CREATE, TEE_HANDLE_NULL, NULL, 0, index_object);
+        TEE_Result create_res = TEE_CreatePersistentObject(TEE_STORAGE_PRIVATE, INDEX_TABLE_ID, strlen(INDEX_TABLE_ID)+1, TEE_DATA_FLAG_ACCESS_WRITE | TEE_DATA_FLAG_ACCESS_READ | TEE_DATA_FLAG_OVERWRITE, TEE_HANDLE_NULL, NULL, 0, index_object);
         if(create_res!=TEE_SUCCESS) {
             EMSG("TEE_CreatePersistentObject failed, res=0x%08x", res);
             return false;
@@ -90,7 +90,7 @@ bool store_index(){
     }
 
     // 写入新数据
-    res = TEE_WriteObjectData(*index_object, index_table, sizeof(index_table));
+    res = TEE_WriteObjectData(*index_object, &index_table, sizeof(index_table));
     if (res != TEE_SUCCESS) {
         TEE_CloseObject(*index_object);
         EMSG("TEE_WriteObjectData failed, res=0x%08x", res);
@@ -101,14 +101,10 @@ bool store_index(){
 
 
 void close_index_obj(){
-    if(TEE_CloseObject(*index_object)!=TEE_SUCCESS){
-        EMSG("Failed to close index object\n");
-    }
+    TEE_CloseObject(*index_object);
 }
 void close_db_obj(){
-    if(TEE_CloseObject(*db_object)!=TEE_SUCCESS){
-        EMSG("Failed to close db object\n");
-    }
+    TEE_CloseObject(*db_object);
 }
 
 static uint32_t get_hash_index(const char* str) {
@@ -161,7 +157,7 @@ static char* get_filepath_by_offset(uint32_t offset, size_t pathlen){
 
 }
 
-static uint32_t get_hash_index(const char* path) {
+static uint32_t get_db_index(const char* path) {
     //不存在返回TABLE_SIZE+1；
     uint32_t hash = get_hash_index(path);
     uint32_t index = hash % TABLE_SIZE;
@@ -184,8 +180,9 @@ static uint32_t get_hash_index(const char* path) {
         if (index == original_index) {
             break;
         }
+        TEE_Free(stored_path);
     }
-    TEE_Free(stored_path);
+   
     return UINT32_MAX;  // 使用UINT32_MAX表示未找到
 }
 
@@ -205,7 +202,7 @@ TEE_Result store_db_line(uint32_t param_types, TEE_Param params[4]) {
     size_t line_sz=params[1].memref.size;
 
     //检查是否已存在
-    if(get_hash_index(filepath)!=UINT32_MAX){
+    if(get_db_index(filepath)!=UINT32_MAX){
         EMSG("File has allready exist in db.\n");
         return TEE_ERROR_GENERIC;
     }
@@ -227,8 +224,7 @@ TEE_Result store_db_line(uint32_t param_types, TEE_Param params[4]) {
     }
     
     //写db_line 
-    TEE_ObjectInfo info;
-    TEE_Result res = TEE_GetObjectInfo1(*db_object, &info);
+    res = TEE_GetObjectInfo1(*db_object, &info);
     if (res != TEE_SUCCESS) {
         IMSG("TEE_GetObjectInfo1 failed, object might not been open.\n");
         return res;
@@ -264,8 +260,8 @@ TEE_Result check_file(uint32_t param_types, TEE_Param params[4]) {
     db_line* line=(db_line*)params[1].memref.buffer;
     size_t line_sz=params[1].memref.size;
     //查索引
-    uint32_t index=get_hash_index(filepath);
-    line_offset=index_table.hash_table[index].db_line_offset;
+    uint32_t index=get_db_index(filepath);
+    uint32_t line_offset=index_table.hash_table[index].db_line_offset;
     if(index==UINT32_MAX){
         params[2].value.a=TA_CHECK_RESULT_NO_MATCH_FILE;
         return TEE_SUCCESS;

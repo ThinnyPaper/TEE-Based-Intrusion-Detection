@@ -33,6 +33,7 @@
 
 #include "db_line.h"
 #include "readconf.h"
+#include "genfile.h"
 #include "util.h"
 #include "ta_command.h"
 #include "idtt_ta.h"

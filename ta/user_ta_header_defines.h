@@ -35,7 +35,7 @@
 /* To get the TA UUID definition */
 #include <idtt_ta.h>
 
-#define TA_UUID				TA_HELLO_WORLD_UUID
+#define TA_UUID				IDTT_TA_UUID
 
 /*
  * TA properties: multi-instance TA, no specific attribute
@@ -55,12 +55,6 @@
 /* The gpd.ta.description property */
 #define TA_DESCRIPTION	"OP-TEE idtt Trusted Application"
 
-/* Extra properties */
-#define TA_CURRENT_TA_EXT_PROPERTIES \
-    { "org.linaro.optee.examples.hello_world.property1", \
-	USER_TA_PROP_TYPE_STRING, \
-        "Some string" }, \
-    { "org.linaro.optee.examples.hello_world.property2", \
-	USER_TA_PROP_TYPE_U32, &(const uint32_t){ 0x0010 } }
+
 
 #endif /* USER_TA_HEADER_DEFINES_H */

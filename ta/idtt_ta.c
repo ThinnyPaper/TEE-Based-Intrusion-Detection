@@ -1,7 +1,7 @@
 #include <tee_internal_api.h>
 #include <tee_internal_api_extensions.h>
 #include "ta_command.h"
-#include "db.h"
+#include "db_line.h"
 #include "secure_storage.h"
 
 bool it_loaded=false; //index_table
@@ -73,7 +73,7 @@ TEE_Result TA_InvokeCommandEntryPoint(void *session, uint32_t command_id, uint32
 				it_loaded=true;
 			}else{
 				IMSG("Load index failed.\n");
-				return TEE_ERROR_ACCESS_DENIED
+				return TEE_ERROR_ACCESS_DENIED;
 			}		
 		}
 		if(!db_opened){
@@ -99,7 +99,7 @@ TEE_Result TA_InvokeCommandEntryPoint(void *session, uint32_t command_id, uint32
 				it_loaded=true;
 			}else{
 				IMSG("Load index failed.\n");
-				return TEE_ERROR_ACCESS_DENIED
+				return TEE_ERROR_ACCESS_DENIED;
 			}
 		}
 		if(!db_opened){

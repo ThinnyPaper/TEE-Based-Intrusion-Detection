@@ -1,10 +1,13 @@
 #include <sys/stat.h>
-#include <mhash.h>
+#include <gcrypt.h>
+
+//#include <mhash.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include "db_line.h"
+#include "util.h"
 #define BLOCK_SIZE 1024
 /*/
   //char* filename;
@@ -38,7 +41,7 @@ db_line* gen_file_to_db_line(char* file){
     db_line* ret=checked_malloc(sizeof(db_line));
 
     //strncpy(ret->fullpath, file, sizeof(file));
-    /*
+    
     ret->perm = (unsigned int)fileInfo.st_mode;
     ret->uid = (unsigned int)fileInfo.st_uid;      
     ret->gid = (unsigned int)fileInfo.st_gid;       
@@ -49,7 +52,7 @@ db_line* gen_file_to_db_line(char* file){
     ret->nlink = (unsigned int)fileInfo.st_nlink;   
     ret->size = (long long)fileInfo.st_size;     
     ret->bcount = (long long)fileInfo.st_blocks;   
-    */
+    /*
     ret->perm = (unsigned int)fileInfo.st_mode;
     ret->uid = fileInfo.st_uid;      
     ret->gid = fileInfo.st_gid;       
@@ -60,6 +63,7 @@ db_line* gen_file_to_db_line(char* file){
     ret->nlink = fileInfo.st_nlink;   
     ret->size = fileInfo.st_size;     
     ret->bcount = fileInfo.st_blocks;  
+    */
     /*  
     printf("mode%d\n",ret->perm);
     printf("uid%d\n",ret->uid);
@@ -72,7 +76,7 @@ db_line* gen_file_to_db_line(char* file){
     printf("size%d\n",(ret->size));
     */
 
-
+/*
     //mhash
     MHASH td_sha256, td_whirlpool;
     unsigned char buffer[BLOCK_SIZE];
@@ -107,7 +111,57 @@ db_line* gen_file_to_db_line(char* file){
     free(hash_sha256); 
     memcpy(ret->hash_whirlpool, hash_whirlpool, 64); 
     free(hash_whirlpool); 
+    fclose(fp);
+*/
+    //gcrypt
+    gcry_md_hd_t sha256_handle, whirlpool_handle;
+    unsigned char buffer[BLOCK_SIZE];
+    size_t read_bytes;
 
+    // 打开文件
+    FILE* fp = fopen(file, "rb");
+    if (!fp) {
+        printf("Failed to open file\n");
+        return NULL;
+    }
+
+    // 初始化 SHA-256
+    if (gcry_md_open(&sha256_handle, GCRY_MD_SHA256, 0)) {
+        fprintf(stderr, "Failed to initialize SHA-256 hash\n");
+        fclose(fp);
+        return NULL;
+    }
+
+    // 初始化 Whirlpool
+    if (gcry_md_open(&whirlpool_handle, GCRY_MD_WHIRLPOOL, 0)) {
+        fprintf(stderr, "Failed to initialize Whirlpool hash\n");
+        gcry_md_close(sha256_handle);
+        fclose(fp);
+        return NULL;
+    }
+
+    // 读取文件并更新哈希
+    while ((read_bytes = fread(buffer, 1, BLOCK_SIZE, fp)) > 0) {
+        gcry_md_write(sha256_handle, buffer, read_bytes);
+        gcry_md_write(whirlpool_handle, buffer, read_bytes);
+    }
+
+    // 检查是否因为除了EOF之外的错误而停止读取
+    if (ferror(fp)) {
+        printf("Error reading from file");
+        gcry_md_close(sha256_handle);
+        gcry_md_close(whirlpool_handle);
+        fclose(fp);
+        return NULL;
+    }
+
+    // 获取最终的哈希值
+    memcpy(ret->hash_sha256, gcry_md_read(sha256_handle, GCRY_MD_SHA256), 32);
+    memcpy(ret->hash_whirlpool, gcry_md_read(whirlpool_handle, GCRY_MD_WHIRLPOOL), 64);
+
+    // 清理
+    gcry_md_close(sha256_handle);
+    gcry_md_close(whirlpool_handle);
     fclose(fp);
     
     return ret;

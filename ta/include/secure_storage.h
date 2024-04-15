@@ -6,8 +6,6 @@
 
 #include "config.h"
 
-#define RETOK 0
-#define RETFAIL -1
 
 typedef struct {
     uint32_t hash_index;
@@ -19,7 +17,7 @@ typedef struct {
 #define TABLE_SIZE MAX_FILE_NUMEBER
 
 typedef struct {
-    unsigned int cnt_file=0;
+    unsigned int cnt_file;
     HashIndexEntry hash_table[TABLE_SIZE];
 }IndexTable;
 
@@ -31,13 +29,13 @@ extern IndexTable index_table;
 extern TEE_ObjectHandle *index_object;
 extern TEE_ObjectHandle *db_object;
 
-bool check_db_exist();
+bool check_db_exist(void);
 bool open_db(uint32_t flag);
 bool load_index(uint32_t flag);
-bool store_index();
-void close_index_obj();
-void close_db_obj();
-TEE_Result init_db_obj();
+bool store_index(void);
+void close_index_obj(void);
+void close_db_obj(void);
+TEE_Result init_db_obj(void);
 TEE_Result store_db_line(uint32_t param_types, TEE_Param params[4]);
 TEE_Result check_file(uint32_t param_types, TEE_Param params[4]);
 
