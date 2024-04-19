@@ -10,9 +10,7 @@ find_package(gcrypt)
 target_include_directories(${PROJECT_NAME}
 			   PRIVATE ta/include
 			   PRIVATE host/include
-			   PRIVATE include
-			   PRIVATE /home/TP/libconfig-out/include
-			   PRIVATE /home/TP/libgcrypt-out/include)
+			   PRIVATE include)
 
 target_link_libraries (${PROJECT_NAME} 
 						PRIVATE teec
