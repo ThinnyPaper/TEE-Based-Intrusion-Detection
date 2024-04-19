@@ -21,6 +21,8 @@
 #include "secure_storage.h"
 #include <stdint.h>
 #include <string.h>
+#include <tee_internal_api.h>
+#include <tee_internal_api_extensions.h>
 
 #include "db_line.h"
 #include "idtt_ta_command.h"
@@ -30,28 +32,34 @@
 //开放寻址双重散列解决冲突
 bool check_db_exist(){
     IMSG("start check_db_exist\n");
+
     TEE_Result res;
     TEE_ObjectHandle object_handle = TEE_HANDLE_NULL;
     // 尝试打开指定 ID 的持久对象
     res = TEE_OpenPersistentObject(TEE_STORAGE_PRIVATE,
-                                   DB_ID, strlen(DB_ID),
+                                   DB_ID, strlen(DB_ID)+1,
                                    TEE_DATA_FLAG_ACCESS_READ, &object_handle);
+
     if (res == TEE_SUCCESS) {
         // 对象存在，关闭对象句柄
+        IMSG("DB exist\n");
         TEE_CloseObject(object_handle);
         return true;
     }
+    IMSG("DB not exist\n");
+
     return false;
 }
 TEE_Result init_db_obj(){
     //index_table
+    IMSG("start init db object\n");
     TEE_Result res;
     uint32_t flag = TEE_DATA_FLAG_ACCESS_WRITE | TEE_DATA_FLAG_ACCESS_READ | TEE_DATA_FLAG_OVERWRITE;
     //TODO: index obj需不需要打开？直接存就行？
     res = TEE_CreatePersistentObject(TEE_STORAGE_PRIVATE, INDEX_TABLE_ID, strlen(INDEX_TABLE_ID)+1, flag, TEE_HANDLE_NULL, NULL, 0, index_object);
-    if(res!=TEE_SUCCESS) return TEE_ERROR_GENERIC;
+    if(res!=TEE_SUCCESS) return res;
     res = TEE_CreatePersistentObject(TEE_STORAGE_PRIVATE, DB_ID, strlen(DB_ID)+1, flag, TEE_HANDLE_NULL, NULL, 0, db_object);
-    if(res!=TEE_SUCCESS) return TEE_ERROR_GENERIC;
+    if(res!=TEE_SUCCESS) return res;
     return TEE_SUCCESS;
 }
 
@@ -221,7 +229,7 @@ TEE_Result store_db_line(uint32_t param_types, TEE_Param params[4]) {
 	size_t filepath_sz=params[0].memref.size;
     db_line* line=(db_line*)params[1].memref.buffer;
     size_t line_sz=params[1].memref.size;
-
+    IMSG("Store db_line of %s\n", filepath);
     //检查是否已存在
     if(get_db_index(filepath)!=UINT32_MAX){
         EMSG("File has allready exist in db.\n");

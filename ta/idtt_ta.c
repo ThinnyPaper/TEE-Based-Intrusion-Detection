@@ -50,7 +50,11 @@ TEE_Result TA_OpenSessionEntryPoint(uint32_t param_types,
 	(void)&param_types;
     (void)&params;
     (void)&sess_ctx;
-   
+	index_object=TEE_Malloc(sizeof(TEE_ObjectHandle), 0);
+	db_object=TEE_Malloc(sizeof(TEE_ObjectHandle), 0);
+
+	*index_object=TEE_HANDLE_NULL;
+	*db_object=TEE_HANDLE_NULL;
     return TEE_SUCCESS;
 }
 
@@ -62,6 +66,9 @@ void TA_CloseSessionEntryPoint(void __maybe_unused *sess_ctx)
 	}
 	close_index_obj();
 	close_db_obj();
+
+	TEE_Free(index_object);
+	TEE_Free(db_object);
 
 	IMSG("Session has been closed\n");
 }
