@@ -12,11 +12,6 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
- * Portions of this program are based on AIDE(Advanced Intrusion
- * Detection Environment) by Rami Lehti, Pablo Virolainen, 
- * Mike Markley, Richard van den Berg, Hannes von Haugwitz 
- * (Copyright (C) 1999-2006, 2010-2013, 2015-2017, 2019-2021). 
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
