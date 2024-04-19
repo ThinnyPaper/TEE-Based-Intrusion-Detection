@@ -73,6 +73,7 @@ TEE_Result TA_InvokeCommandEntryPoint(void *session, uint32_t command_id, uint32
 
     switch (command_id) {
 	case TA_CMD_INITDB: {
+		IMSG("start TA_CMD_INITDB\n");
 		if(check_db_exist()){
 			IMSG("Database exist. Can not init.\n");
 			return TEE_ERROR_GENERIC;
@@ -87,6 +88,7 @@ TEE_Result TA_InvokeCommandEntryPoint(void *session, uint32_t command_id, uint32
 		break;
 		}
     case TA_CMD_STORE: {
+		IMSG("start TA_CMD_STORE\n");
 		if(!it_loaded){
 			uint32_t index_load_flag = TEE_DATA_FLAG_ACCESS_WRITE | TEE_DATA_FLAG_ACCESS_READ | TEE_DATA_FLAG_OVERWRITE;
 			if(load_index(index_load_flag)==true){
@@ -113,6 +115,7 @@ TEE_Result TA_InvokeCommandEntryPoint(void *session, uint32_t command_id, uint32
 		break;
 	}
 	case TA_CMD_CHECK: {
+		IMSG("start TA_CMD_CHECK\n");
 		if(!it_loaded){
 			uint32_t index_load_flag = TEE_DATA_FLAG_ACCESS_READ;
 			if(load_index(index_load_flag)==true){

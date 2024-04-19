@@ -29,6 +29,7 @@
 //一个哈希表对应完整路径到偏移量
 //开放寻址双重散列解决冲突
 bool check_db_exist(){
+    IMSG("start check_db_exist\n");
     TEE_Result res;
     TEE_ObjectHandle object_handle = TEE_HANDLE_NULL;
     // 尝试打开指定 ID 的持久对象

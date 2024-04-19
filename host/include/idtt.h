@@ -20,7 +20,6 @@
 #ifndef _IDTT_H
 #define _IDTT_H
 
-#include <config.h>
 #include <stdlib.h>
 #include <list.h>
 

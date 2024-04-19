@@ -77,7 +77,7 @@ static void read_param(int argc,char**argv){
             case 'i':{
                 if(conf->action==0){ 
                     conf->action=DO_INIT; 
-                    printf("command: init database"); 
+                    printf("command: init database\n"); 
                     break;
                 } else { 
                     exit(-1); 
@@ -86,7 +86,7 @@ static void read_param(int argc,char**argv){
             case 'a':{
                 if(conf->action==0){ 
                     conf->action=DO_CHECKALL; 
-                    printf("command: check all files"); 
+                    printf("command: check all files\n"); 
                     break;
                 } else { 
                     exit(-1); 
@@ -97,7 +97,7 @@ static void read_param(int argc,char**argv){
                     conf->action=DO_CHECK; 
                     filename=checked_malloc(sizeof(optarg));
                     strncpy(filename,optarg,sizeof(optarg)-1);
-                    printf("command: check file %s", optarg); 
+                    printf("command: check file %s\n", optarg); 
                     break;
                 } else { 
                     exit(-1); 
@@ -175,9 +175,10 @@ int main(int argc,char**argv){
     //check_result=TA_CHECK_RESULT_NO_MATCH_FILE;
 
     conf=(idtt_config*)checked_malloc(sizeof(idtt_config));
+    setdefaults_idtt_config();
+
     read_param(argc, argv);
 
-    setdefaults_idtt_config();
 
     //get hostname 
     conf->hostname = checked_malloc(sizeof(char) * MAXHOSTNAMELEN + 1);
