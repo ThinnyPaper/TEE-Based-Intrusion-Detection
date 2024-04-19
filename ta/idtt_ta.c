@@ -1,6 +1,6 @@
 #include <tee_internal_api.h>
 #include <tee_internal_api_extensions.h>
-#include "ta_command.h"
+#include "idtt_ta_command.h"
 #include "db_line.h"
 #include "secure_storage.h"
 
