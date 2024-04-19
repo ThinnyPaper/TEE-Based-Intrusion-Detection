@@ -1,5 +1,5 @@
 /*
- * TIDE (Intrusion Detection Tool Based on TEE)
+ * IDTT (Intrusion Detection Tool Based on TEE)
  *
  * Copyright (C) 2024 Yang Zhe
  *
@@ -41,6 +41,8 @@
 #ifndef MAXHOSTNAMELEN
 #define MAXHOSTNAMELEN 256
 #endif
+#define CONFIG_FILE "/root/idtt.conf"
+
 idtt_config* conf;
 char* filename;
 

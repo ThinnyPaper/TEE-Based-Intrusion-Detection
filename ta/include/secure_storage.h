@@ -4,9 +4,7 @@
 #include <tee_internal_api.h>
 #include <tee_internal_api_extensions.h>
 
-#include "config.h"
-
-
+#define MAX_FILE_NUMEBER 20
 typedef struct {
     uint32_t hash_index;
     uint32_t filepath_offset;   

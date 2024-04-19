@@ -3,32 +3,6 @@
 #include "list.h"
 #include "util.h"
 
-/* list
- * limitations:
- * Only the head knows where the tail is
- * Every item knows where the head is
- 
- * And that is not true anymore. 
- * Now list has header which knows head and tail.
- * Every item knows header.
- 
- */
-
-
-
-/* list_append()
- * append an item to list
- * returns the head
- * The first argument is the head of the list
- * The second argument is the data to be added
- * Returns list head
- */
-
-
-/* 
- * Some way to handle mallocs failure would be nice.
- */
-
 node* list_append(node* listp,void*data)
 {
   node* newitem=NULL;
