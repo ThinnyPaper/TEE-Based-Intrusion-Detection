@@ -318,7 +318,7 @@ TEE_Result check_file(uint32_t param_types, TEE_Param params[4]) {
     if (line->size != stored_line->size) check_flag|=CHECK_SIZE_INCONSIS;
     if (line->bcount != stored_line->bcount) check_flag|=CHECK_BCOUNT_INCONSIS;
     if (memcmp(line->hash_sha256, stored_line->hash_sha256, 32) != 0) check_flag|=CHECK_SHA256_INCONSIS;
-    if (memcmp(line->hash_whirlpool, stored_line->hash_whirlpool, 64) != 0) check_flag|=CHECK_WHIRLPOOL_INCONSIS;
+    //if (memcmp(line->hash_whirlpool, stored_line->hash_whirlpool, 64) != 0) check_flag|=CHECK_WHIRLPOOL_INCONSIS;
 
     TEE_Free(stored_line);
     IMSG("Checking file finished, return result...\n");

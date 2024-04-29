@@ -44,7 +44,7 @@ typedef struct db_line {
   //unsigned char hash_md5[20];
   //unsigned char* sha256;
   unsigned char hash_sha256[32];
-  unsigned char hash_whirlpool[64];
+  //unsigned char hash_whirlpool[64];
 
 
 } db_line;

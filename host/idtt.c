@@ -191,7 +191,7 @@ int main(int argc,char**argv){
     }
 
     //读config文件
-    printf("read configure file: %s", conf->config_file);
+    printf("read configure file: %s\n", conf->config_file);
     readconf(conf->config_file, conf);
     /*
     node* it=conf->filelist;
