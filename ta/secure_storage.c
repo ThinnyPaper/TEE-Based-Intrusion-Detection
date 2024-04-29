@@ -56,8 +56,8 @@ TEE_Result init_db_obj(){
     TEE_Result res;
     uint32_t flag = TEE_DATA_FLAG_ACCESS_WRITE | TEE_DATA_FLAG_ACCESS_READ | TEE_DATA_FLAG_OVERWRITE;
     //TODO: index obj需不需要打开？直接存就行？
-    res = TEE_CreatePersistentObject(TEE_STORAGE_PRIVATE, INDEX_TABLE_ID, strlen(INDEX_TABLE_ID)+1, flag, TEE_HANDLE_NULL, NULL, 0, index_object);
-    if(res!=TEE_SUCCESS) return res;
+    //res = TEE_CreatePersistentObject(TEE_STORAGE_PRIVATE, INDEX_TABLE_ID, strlen(INDEX_TABLE_ID)+1, flag, TEE_HANDLE_NULL, NULL, 0, index_object);
+    //if(res!=TEE_SUCCESS) return res;
     res = TEE_CreatePersistentObject(TEE_STORAGE_PRIVATE, DB_ID, strlen(DB_ID)+1, flag, TEE_HANDLE_NULL, NULL, 0, db_object);
     if(res!=TEE_SUCCESS) return res;
     return TEE_SUCCESS;
@@ -65,7 +65,7 @@ TEE_Result init_db_obj(){
 
 bool open_db(uint32_t flag){
     TEE_Result res;
-    res = TEE_OpenPersistentObject(TEE_STORAGE_PRIVATE, DB_ID, strlen(DB_ID)+1, flag, *db_object);
+    res = TEE_OpenPersistentObject(TEE_STORAGE_PRIVATE, DB_ID, strlen(DB_ID)+1, flag, db_object);
 	if (res != TEE_SUCCESS) {
 		EMSG("Failed to open db object, res=0x%08x", res);
 		return false;
@@ -75,14 +75,14 @@ bool open_db(uint32_t flag){
 
 bool load_index(uint32_t flag){
     TEE_Result res;
-    res = TEE_OpenPersistentObject(TEE_STORAGE_PRIVATE, INDEX_TABLE_ID, strlen(INDEX_TABLE_ID)+1, flag, *index_object);
+    res = TEE_OpenPersistentObject(TEE_STORAGE_PRIVATE, INDEX_TABLE_ID, strlen(INDEX_TABLE_ID)+1, flag, index_object);
 	if (res != TEE_SUCCESS) {
 		EMSG("Failed to open index table object, res=0x%08x", res);
 		return false;
 	}
 
     uint32_t count=0;
-    res = TEE_ReadObjectData(index_object, &index_table, sizeof(index_table),
+    res = TEE_ReadObjectData(*index_object, &index_table, sizeof(index_table),
 				 &count);
 
 	if (res != TEE_SUCCESS || count != sizeof(index_table)) {
@@ -97,19 +97,13 @@ bool store_index(){
     TEE_Result res;
     // 打开对象
     res = TEE_OpenPersistentObject(TEE_STORAGE_PRIVATE, INDEX_TABLE_ID, strlen(INDEX_TABLE_ID)+1,
-                                   TEE_DATA_FLAG_ACCESS_WRITE | TEE_DATA_FLAG_ACCESS_READ | TEE_DATA_FLAG_OVERWRITE,
+                                   TEE_DATA_FLAG_ACCESS_READ,
                                    index_object);
-    if (res = TEE_ERROR_ITEM_NOT_FOUND) {
-        TEE_Result create_res = TEE_CreatePersistentObject(TEE_STORAGE_PRIVATE, INDEX_TABLE_ID, strlen(INDEX_TABLE_ID)+1, TEE_DATA_FLAG_ACCESS_WRITE | TEE_DATA_FLAG_ACCESS_READ | TEE_DATA_FLAG_OVERWRITE, TEE_HANDLE_NULL, NULL, 0, index_object);
-        if(create_res!=TEE_SUCCESS) {
-            EMSG("TEE_CreatePersistentObject failed, res=0x%08x", res);
-            return false;
-        }
-    }else if(res!=TEE_SUCCESS){
-        EMSG("TEE_OpenPersistentObject failed, res=0x%08x", res);
-        return false;
+    if(res==TEE_SUCCESS){
+        IMSG("Index table obj exist, remove old.\n");
+        TEE_CloseAndDeletePersistentObject1(*index_object);
     }
-
+    /*
     // 清空对象内容
     res = TEE_TruncateObjectData(index_object, 0);
     if (res != TEE_SUCCESS) {
@@ -117,7 +111,11 @@ bool store_index(){
         TEE_CloseObject(*index_object);
         return false;
     }
+*/
 
+    uint32_t flag = TEE_DATA_FLAG_ACCESS_WRITE | TEE_DATA_FLAG_ACCESS_READ | TEE_DATA_FLAG_OVERWRITE;
+    res = TEE_CreatePersistentObject(TEE_STORAGE_PRIVATE, INDEX_TABLE_ID, strlen(INDEX_TABLE_ID)+1, flag, TEE_HANDLE_NULL, NULL, 0, index_object);
+    if(res!=TEE_SUCCESS) return res;
     // 写入新数据
     res = TEE_WriteObjectData(*index_object, &index_table, sizeof(index_table));
     if (res != TEE_SUCCESS) {
@@ -125,6 +123,7 @@ bool store_index(){
         EMSG("TEE_WriteObjectData failed, res=0x%08x", res);
         return false;
     }
+
     return true;
 }
 
@@ -311,7 +310,7 @@ TEE_Result check_file(uint32_t param_types, TEE_Param params[4]) {
     if (line->perm != stored_line->perm) check_flag|=CHECK_PERM_INCONSIS;
     if (line->uid != stored_line->uid) check_flag|=CHECK_UID_INCONSIS;
     if (line->gid != stored_line->gid) check_flag|=CHECK_GID_INCONSIS;
-    if (line->atime != stored_line->atime) check_flag|=CHECK_ATIME_INCONSIS;
+    //if (line->atime != stored_line->atime) check_flag|=CHECK_ATIME_INCONSIS;
     if (line->ctime != stored_line->ctime) check_flag|=CHECK_CTIME_INCONSIS;
     if (line->mtime != stored_line->mtime) check_flag|=CHECK_MTIME_INCONSIS;
     if (line->inode != stored_line->inode) check_flag|=CHECK_INODE_INCONSIS;
@@ -322,7 +321,7 @@ TEE_Result check_file(uint32_t param_types, TEE_Param params[4]) {
     if (memcmp(line->hash_whirlpool, stored_line->hash_whirlpool, 64) != 0) check_flag|=CHECK_WHIRLPOOL_INCONSIS;
 
     TEE_Free(stored_line);
-    
+    IMSG("Checking file finished, return result...\n");
     if(check_flag==0){
         params[2].value.a=TA_CHECK_RESULT_CONSISTENT;
     }else{

@@ -137,9 +137,9 @@ static TEEC_Result do_check_one(TEEC_Session *sess, char* filepath){
     op.params[1].tmpref.buffer = line;
     op.params[1].tmpref.size = sizeof(db_line);
 
-    res=TEEC_InvokeCommand(sess, TA_CMD_STORE, &op, &err_origin);
+    res=TEEC_InvokeCommand(sess, TA_CMD_CHECK, &op, &err_origin);
     if (res != TEEC_SUCCESS) {
-        printf("TEEC_InvokeCommand TA_CMD_STORE ERROR\n");
+        printf("TEEC_InvokeCommand TA_CMD_CHECK ERROR\n");
         return res;
     }
     uint32_t check_result=op.params[2].value.a;
@@ -203,7 +203,7 @@ int main(int argc,char**argv){
     if(conf->action==NO_ACTION){
         printf("NO ACTION\n");
         exit(1);
-    }else if (conf->action!=DO_INIT && conf->action!=DO_CHECK){
+    }else if (conf->action!=DO_INIT && conf->action!=DO_CHECK && conf->action!=DO_CHECKALL){
         printf("BAD ACTION\n");
         exit(1);
     }

@@ -65,7 +65,7 @@ db_line* gen_file_to_db_line(char* file){
     ret->perm = (unsigned int)fileInfo.st_mode;
     ret->uid = (unsigned int)fileInfo.st_uid;      
     ret->gid = (unsigned int)fileInfo.st_gid;       
-    ret->atime = (long long)fileInfo.st_atime;        
+    //ret->atime = (long long)fileInfo.st_atime;        
     ret->ctime = (long long)fileInfo.st_ctime;
     ret->mtime = (long long)fileInfo.st_mtime;        
     ret->inode = (unsigned long long)fileInfo.st_ino;   

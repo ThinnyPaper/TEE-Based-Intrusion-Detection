@@ -33,7 +33,7 @@ typedef struct db_line {
   unsigned int perm; //权限
   unsigned int uid; //文件所有者的用户ID
   unsigned int gid; //文件所属组的组ID
-  long long atime; //文件的最后访问时间
+  //long long atime; //文件的最后访问时间
   long long ctime; //文件状态最后更改的时间
   long long mtime; //文件内容最后修改的时间
   unsigned long long inode; //文件的inode编号

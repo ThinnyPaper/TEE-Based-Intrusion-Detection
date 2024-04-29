@@ -61,9 +61,12 @@ TEE_Result TA_OpenSessionEntryPoint(uint32_t param_types,
 void TA_CloseSessionEntryPoint(void __maybe_unused *sess_ctx)
 {
 	(void)&sess_ctx; /* Unused parameter */
+
 	if(index_changed){
+		IMSG("Database index table has been change, try to restore.\n");
 		store_index();
 	}
+
 	close_index_obj();
 	close_db_obj();
 
@@ -124,6 +127,7 @@ TEE_Result TA_InvokeCommandEntryPoint(void *session, uint32_t command_id, uint32
 	case TA_CMD_CHECK: {
 		IMSG("start TA_CMD_CHECK\n");
 		if(!it_loaded){
+		IMSG("Try to load index table\n");
 			uint32_t index_load_flag = TEE_DATA_FLAG_ACCESS_READ;
 			if(load_index(index_load_flag)==true){
 				it_loaded=true;
@@ -133,6 +137,7 @@ TEE_Result TA_InvokeCommandEntryPoint(void *session, uint32_t command_id, uint32
 			}
 		}
 		if(!db_opened){
+		IMSG("Try to open database\n");
 			uint32_t db_open_flag = TEE_DATA_FLAG_ACCESS_READ;
 			if(open_db(db_open_flag)==true){
 				db_opened=true;
