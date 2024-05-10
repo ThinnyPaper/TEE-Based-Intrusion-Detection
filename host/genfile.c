@@ -167,6 +167,6 @@ db_line* gen_file_to_db_line(char* file){
     fclose(fp);
     end=clock();
     cpu_time=((double)(end-start))/CLOCKS_PER_SEC;
-    //printf("Time of culculate SHA-256 is %f seconds.\n", cpu_time);
+    printf("Time of culculate SHA-256 is %f seconds.\n", cpu_time);
     return ret;
 }

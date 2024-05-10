@@ -25,6 +25,7 @@
 #include <limits.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #include "db_line.h"
 #include "readconf.h"
@@ -124,6 +125,11 @@ static void setdefaults_idtt_config(){
 }
 
 static TEEC_Result do_check_one(TEEC_Session *sess, char* filepath){
+    //time
+    clock_t start, end;
+    double cpu_time;
+    start=clock();
+
     printf("Checking %s\n",filepath);
     db_line *line=gen_file_to_db_line(filepath);
     //to TEE
@@ -167,6 +173,11 @@ static TEEC_Result do_check_one(TEEC_Session *sess, char* filepath){
         printf("GET BAD check_result\n");
         return TEEC_ERROR_GENERIC;
     }
+
+    end=clock();
+    cpu_time=((double)(end-start))/CLOCKS_PER_SEC;
+    printf("Time of checking one file is %f seconds.\n", cpu_time);
+
     return TEEC_SUCCESS;
 }
 
