@@ -50,6 +50,12 @@ bool check_db_exist(){
 
     return false;
 }
+void clean_all_obj(){
+    IMSG("start clean_all_obj\n");
+    // 删除持久对象
+    TEE_CloseAndDeletePersistentObject1(*index_object);
+    TEE_CloseAndDeletePersistentObject1(*db_object);
+}
 TEE_Result init_db_obj(){
     //index_table
     IMSG("start init db object\n");
@@ -101,7 +107,7 @@ bool store_index(){
                                    index_object);
     if(res==TEE_SUCCESS){
         IMSG("Index table obj exist, remove old.\n");
-        TEE_CloseAndDeletePersistentObject1(*index_object);
+        //TEE_CloseAndDeletePersistentObject(*index_object);
     }
     /*
     // 清空对象内容

@@ -41,7 +41,7 @@
 
 idtt_config* conf;
 char* filename;
-
+static double alltime;
 static void usage(int exitvalue){
   fprintf(stdout,
 	"Usage: idtt cammand [args]\n\n"
@@ -176,7 +176,8 @@ static TEEC_Result do_check_one(TEEC_Session *sess, char* filepath){
 
     end=clock();
     cpu_time=((double)(end-start))/CLOCKS_PER_SEC;
-    printf("Time of checking one file is %f seconds.\n", cpu_time);
+    alltime+=cpu_time;
+    printf("Time of checking one file is %f seconds.\n", alltime);
 
     return TEEC_SUCCESS;
 }

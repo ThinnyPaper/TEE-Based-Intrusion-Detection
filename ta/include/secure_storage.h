@@ -48,6 +48,7 @@ extern TEE_ObjectHandle *index_object;
 extern TEE_ObjectHandle *db_object;
 
 bool check_db_exist(void);
+void clean_all_obj(void);
 bool open_db(uint32_t flag);
 bool load_index(uint32_t flag);
 bool store_index(void);

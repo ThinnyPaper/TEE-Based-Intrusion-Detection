@@ -85,8 +85,10 @@ TEE_Result TA_InvokeCommandEntryPoint(void *session, uint32_t command_id, uint32
 	case TA_CMD_INITDB: {
 		IMSG("start TA_CMD_INITDB\n");
 		if(check_db_exist()){
-			IMSG("Database exist. Can not init.\n");
-			return TEE_ERROR_GENERIC;
+			//IMSG("Database exist. Can not init.\n");
+			//return TEE_ERROR_GENERIC;
+			IMSG("Database exist. Try to delete old object.\n");
+			clean_all_obj();
 		}
 		ret=init_db_obj();
 		if(ret==TEE_SUCCESS){
