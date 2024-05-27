@@ -190,7 +190,6 @@ static char* get_filepath_by_offset(uint32_t offset, size_t pathlen){
     return path;
 
 }
-
 static uint32_t get_db_index(const char* path) {
     //不存在返回TABLE_SIZE+1；
     uint32_t hash = get_hash_index(path);
@@ -201,20 +200,20 @@ static uint32_t get_db_index(const char* path) {
     if (step == 0) step = 1;
     
     while (index_table.hash_table[index].pathlen!=0) {
-        if(index_table.hash_table[index].hash_index!=hash){
-            continue;
-        }
-        char* stored_path = get_filepath_by_offset(index_table.hash_table[index].filepath_offset, index_table.hash_table[index].pathlen);
-        if (strcmp(stored_path, path) == 0) {
-            TEE_Free(stored_path);
-            return index;  // 找到匹配，返回当前索引
+        if(index_table.hash_table[index].hash_index==hash){        
+            char* stored_path = get_filepath_by_offset(index_table.hash_table[index].filepath_offset, index_table.hash_table[index].pathlen);
+            if (strcmp(stored_path, path) == 0) {
+                TEE_Free(stored_path);
+                return index;  // 找到匹配，返回当前索引
+            }else{
+                TEE_Free(stored_path);
+            }
         }
 
         index = (index + step) % TABLE_SIZE;
         if (index == original_index) {
             break;
-        }
-        TEE_Free(stored_path);
+        }        
     }
    
     return UINT32_MAX;  // 使用UINT32_MAX表示未找到

@@ -62,7 +62,6 @@ db_line* gen_file_to_db_line(char* file){
     }
     db_line* ret=checked_malloc(sizeof(db_line));
 
-    //strncpy(ret->fullpath, file, sizeof(file));
     
     ret->perm = (unsigned int)fileInfo.st_mode;
     ret->uid = (unsigned int)fileInfo.st_uid;      
@@ -75,43 +74,6 @@ db_line* gen_file_to_db_line(char* file){
     ret->size = (long long)fileInfo.st_size;     
     ret->bcount = (long long)fileInfo.st_blocks;   
 
-/*
-    //mhash
-    MHASH td_sha256, td_whirlpool;
-    unsigned char buffer[BLOCK_SIZE];
-    unsigned char *hash_sha256, *hash_whirlpool;
-    size_t bytesRead;
-    // 打开文件
-    FILE* fp = fopen(file, "rb");
-    if (!fp) {
-        printf("Failed to open file\n");
-        return NULL;
-    }
-
-    // 初始化mhash计算为 SHA-256 和 WHIRLPOOL
-    td_sha256 = mhash_init(MHASH_SHA256);
-    td_whirlpool = mhash_init(MHASH_WHIRLPOOL);
-    if (td_sha256 == MHASH_FAILED || td_whirlpool == MHASH_FAILED) {
-        fclose(fp);
-        printf("hash failed\n");
-        return NULL;
-    }
-    
-    // 读取文件并计算哈希
-    while ((bytesRead = fread(buffer, 1, BLOCK_SIZE, fp)) > 0) {
-        mhash(td_sha256, buffer, bytesRead);
-        mhash(td_whirlpool, buffer, bytesRead);
-    }
-    
-    // 获取最终的哈希值
-    hash_sha256 = (unsigned char *)mhash_end(td_sha256);
-    hash_whirlpool = (unsigned char *)mhash_end(td_whirlpool);
-    memcpy(ret->hash_sha256, hash_sha256, 32); 
-    free(hash_sha256); 
-    memcpy(ret->hash_whirlpool, hash_whirlpool, 64); 
-    free(hash_whirlpool); 
-    fclose(fp);
-*/
     clock_t start, end;
     double cpu_time;
     start=clock();
@@ -134,15 +96,7 @@ db_line* gen_file_to_db_line(char* file){
         fclose(fp);
         return NULL;
     }
-/*
-    // 初始化 Whirlpool
-    if (gcry_md_open(&whirlpool_handle, GCRY_MD_WHIRLPOOL, 0)) {
-        fprintf(stderr, "Failed to initialize Whirlpool hash\n");
-        gcry_md_close(sha256_handle);
-        fclose(fp);
-        return NULL;
-    }
-*/
+
     // 读取文件并更新哈希
     while ((read_bytes = fread(buffer, 1, BLOCK_SIZE, fp)) > 0) {
         gcry_md_write(sha256_handle, buffer, read_bytes);
