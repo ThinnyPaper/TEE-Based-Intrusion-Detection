@@ -46,9 +46,9 @@ static void usage(int exitvalue){
   fprintf(stdout,
 	"Usage: idtt cammand [args]\n\n"
     "Cammands:\n"
-    "  -i\t--init\t\tInitialize the database\n"
-    "  -a\t--checkall\t\tCheck all file compare to the database"
-    "  -c [file]\t--check=[file]\t\tCheck [file] compare to the database\n"
+    "  -i\t--init\t\tInitialize the secure storage\n"
+    "  -a\t--checkall\t\tCheck all file compare to the initial information"
+    "  -c [file]\t--check=[file]\t\tCheck [file] compare to the initial information\n"
     "  -h\t--help\t\tPrint this usage"
     "\n"
 	  );
